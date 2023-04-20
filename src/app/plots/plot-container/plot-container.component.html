@@ -1,0 +1,9 @@
+<ng-container [ngSwitch]="data.plotType">
+  <ng-container *ngSwitchCase="'volcano-plot'">
+    <div class="card">
+      <div class="card-body">
+        <app-volcano-plot [data]="data"></app-volcano-plot>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

@@ -1,0 +1,48 @@
+<div class="modal-header">
+  <div class="modal-title">
+    Chart Parameter Selection
+  </div>
+</div>
+<div class="modal-body">
+  <form [formGroup]="initialForm">
+    <div class="form-group">
+      <label for="chartType">Chart Type</label>
+      <select class="form-control" id="chartType" formControlName="plotType">
+        <option *ngFor="let ct of plotTypeList" [value]="ct.value">{{ct.name}}</option>
+      </select>
+    </div>
+    <div class="form-group" *ngIf="data.filenameList.length > 0">
+      <label for="selectedFile">Select Imported File</label>
+      <select class="form-control" id="selectedFile" formControlName="filename">
+        <option *ngFor="let filename of data.filenameList" [value]="filename">{{filename}}</option>
+      </select>
+    </div>
+  </form>
+  <ng-container *ngIf="selectedDF.getColumnNames().length > 0">
+    <ng-container [ngSwitch]="selectedPlotType">
+      <ng-container *ngSwitchCase="'volcano-plot'">
+        <app-volcano-plot-form [columns]="selectedDF.getColumnNames()" #volcano></app-volcano-plot-form>
+      </ng-container>
+      <ng-container *ngSwitchCase="'scatter-plot'">
+        <app-scatter-plot-form [columns]="selectedDF.getColumnNames()" #scatter></app-scatter-plot-form>
+      </ng-container>
+      <ng-container *ngSwitchCase="'bar-chart'">
+        <app-bar-chart-form [columns]="selectedDF.getColumnNames()" #bar></app-bar-chart-form>
+      </ng-container>
+      <ng-container *ngSwitchCase="'box-plot'">
+        <app-box-plot-form [columns]="selectedDF.getColumnNames()" #box></app-box-plot-form>
+      </ng-container>
+      <ng-container *ngSwitchCase="'heatmap'">
+        <app-heatmap-form [columns]="selectedDF.getColumnNames()" #heatmap></app-heatmap-form>
+      </ng-container>
+      <ng-container *ngSwitchCase="'line-chart'">
+        <app-line-chart-form [columns]="selectedDF.getColumnNames()" #line></app-line-chart-form>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" (click)="submit()">Submit</button>
+  <button class="btn btn-default" (click)="activeModal.dismiss()">Cancel</button>
+</div>
