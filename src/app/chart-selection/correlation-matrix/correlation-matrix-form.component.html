@@ -2,8 +2,7 @@
   <div class="card-body">
     <p class="card-text">
       <strong>Primary ID</strong> is the column that contains the primary identifier for each row. This is the column that will be used to match with other data files or metadata that have the same primary identifier. <br>
-      <strong>X Axis</strong> is the column that contains the values that will be used to place the data point on the x axis. <br>
-      <strong>Y Axis</strong> is the column that contains the values that will be used to place the data point on the y axis. <br>
+      <strong>Samples</strong> is the column that contains the values that will be used to calculate a correlation matrix and create a heatmap from the correlation matrix. <br>
     </p>
   </div>
 </div>
@@ -16,14 +15,8 @@
     </select>
   </div>
   <div class="form-group">
-    <label for="xAxis">X Axis</label>
-    <select formControlName="xAxis" class="form-control" id="xAxis" multiple>
-      <option *ngFor="let col of columns" [value]="col">{{col}}</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="yAxis">Y Axis</label>
-    <select formControlName="yAxis" class="form-control" id="yAxis">
+    <label for="samples">Samples</label>
+    <select formControlName="samples" class="form-control" id="Samples" multiple>
       <option *ngFor="let col of columns" [value]="col">{{col}}</option>
     </select>
   </div>

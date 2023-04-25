@@ -1,1 +1,23 @@
-<p>box-plot-form works!</p>
+<div class="card bg-warning mt-2">
+  <div class="card-body">
+    <p class="card-text">
+      <strong>Primary ID</strong> is the column that contains the primary identifier for each row. This is the column that will be used to match with other data files or metadata that have the same primary identifier. <br>
+      <strong>Samples</strong> are the columns that contain the values that will be used to calculate and draw the box-plot and the name of the column will be used to group the samples if they follow the {{"<"}}condition{{">"}}.{{"<"}}replicate{{">"}} convention. <br>
+    </p>
+  </div>
+</div>
+
+<form [formGroup]="form">
+  <div class="form-group">
+    <label for="primaryID">Primary IDs</label>
+    <select formControlName="primaryID" class="form-control" id="primaryID">
+      <option *ngFor="let col of columns" [value]="col">{{col}}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="samples">Samples</label>
+    <select formControlName="samples" class="form-control" id="Samples" multiple>
+      <option *ngFor="let col of columns" [value]="col">{{col}}</option>
+    </select>
+  </div>
+</form>

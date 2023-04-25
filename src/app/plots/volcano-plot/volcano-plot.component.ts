@@ -1,6 +1,8 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {DataFrame, IDataFrame} from "data-forge";
 import {DataService} from "../../services/data.service";
+import {PlotData} from "../../interface/plot-data";
+import {FormBuilder} from "@angular/forms";
 
 @Component({
   selector: 'app-volcano-plot',
@@ -8,6 +10,8 @@ import {DataService} from "../../services/data.service";
   styleUrls: ['./volcano-plot.component.less']
 })
 export class VolcanoPlotComponent {
+  @Output() formChanged: EventEmitter<boolean> = new EventEmitter<boolean>()
+
   graphData: any[] = []
   graphLayout: any = {
     height: 700, width: 700, xaxis: {title: "Log2FC"},
@@ -28,31 +32,53 @@ export class VolcanoPlotComponent {
   pValueColumn: string = ""
   primaryIDColumn: string = ""
 
+  colorKeys: string[] = []
+
   settings: any = {
     plotTitle: "Volcano Plot",
     colorMap: {},
     categories: [],
     volcanoAxis: {minX: 0, maxX: 0, minY: 0, maxY: 0},
-    backGroundColorGrey: false,
+    backgroundColorGrey: false,
     selectedMap: {},
     pCutOff: 0.05,
     fcCutOff: 0.6,
+    manualAxis: false,
+    pointSize: 10,
   }
 
   df: IDataFrame = new DataFrame()
 
-  @Input() set data(value: {df: IDataFrame, form: any, settings: any}) {
-    console.log(value)
+  @Input() set data(value: PlotData) {
     this.fcColumn = value.form.foldChange
     this.pValueColumn = value.form.minuslog10pValue
     this.primaryIDColumn = value.form.primaryID
     this.settings = value.settings
+    this.form.controls['plotTitle'].setValue(this.settings.plotTitle)
+    this.form.controls['pCutOff'].setValue(this.settings.pCutOff)
+    this.form.controls['fcCutOff'].setValue(this.settings.fcCutOff)
+    this.form.controls['backgroundColorGrey'].setValue(this.settings.backGroundColorGrey)
     this.df = value.df
     this.drawGraph()
   }
 
-  constructor(private dataService: DataService) {
+  form = this.fb.group({
+    plotTitle: ['Volcano plot title',],
+    pCutOff: [0.05,],
+    fcCutOff: [0.6,],
+    backgroundColorGrey: [false,],
+    minX: [0,],
+    maxX: [0,],
+    minY: [0,],
+    maxY: [0,],
+    manualAxis: [false,],
+    pointSize: [10,]
+  })
 
+  constructor(private dataService: DataService, private fb: FormBuilder) {
+    this.form.valueChanges.subscribe(() => {
+      this.formChanged.emit(this.form.dirty)
+    })
   }
 
   breakColor: boolean = false
@@ -66,64 +92,92 @@ export class VolcanoPlotComponent {
       xMin: 0, xMax: 0, yMin: 0, yMax: 0
     }
 
+    this.settings.volcanoAxis.minX = this.form.value['minX']
+    this.settings.volcanoAxis.maxX = this.form.value['maxX']
+    this.settings.volcanoAxis.minY = this.form.value['minY']
+    this.settings.volcanoAxis.maxY = this.form.value['maxY']
+    this.settings.plotTitle = this.form.value['plotTitle']
+    this.settings.manualAxis = this.form.value['manualAxis']
+    this.settings.pCutOff = this.form.value['pCutOff']
+    this.settings.fcCutOff = this.form.value['fcCutOff']
+    this.settings.backGroundColorGrey = this.form.value['backgroundColorGrey']
+    this.settings.pointSize = this.form.value['pointSize']
 
+
+    this.layoutMaxMin.xMin = this.df.getSeries(this.fcColumn).where(i => !isNaN(i)).min()
+    this.layoutMaxMin.xMax =this.df.getSeries(this.fcColumn).where(i => !isNaN(i)).max()
+    this.layoutMaxMin.yMin = this.df.getSeries(this.pValueColumn).where(i => !isNaN(i)).min()
+    this.layoutMaxMin.yMax = this.df.getSeries(this.pValueColumn).where(i => !isNaN(i)).max()
+    console.log(this.layoutMaxMin)
     this.graphLayout.xaxis.range = [this.layoutMaxMin.xMin - 0.5, this.layoutMaxMin.xMax + 0.5]
-    if (this.settings.volcanoAxis.minX) {
+    if (this.settings.manualAxis && this.settings.volcanoAxis.minX) {
       this.graphLayout.xaxis.range[0] = this.settings.volcanoAxis.minX
     }
-    if (this.settings.volcanoAxis.maxX) {
+    if (this.settings.manualAxis && this.settings.volcanoAxis.maxX) {
       this.graphLayout.xaxis.range[1] = this.settings.volcanoAxis.maxX
     }
     this.graphLayout.yaxis.range = [0, this.layoutMaxMin.yMax - this.layoutMaxMin.yMin / 2]
-    if (this.settings.volcanoAxis.minY) {
+    if (this.settings.manualAxis && this.settings.volcanoAxis.minY) {
       this.graphLayout.yaxis.range[0] = this.settings.volcanoAxis.minY
     }
-    if (this.settings.volcanoAxis.maxY) {
+    if (this.settings.manualAxis && this.settings.volcanoAxis.maxY) {
       this.graphLayout.yaxis.range[1] = this.settings.volcanoAxis.maxY
     }
     let currentPosition = 0
     this.df.forEach((row:any) => {
-      if (row[this.fcColumn] && row[this.pValueColumn] && row[this.primaryIDColumn]) {
-        const fc = row[this.fcColumn]
-        const pValue = row[this.pValueColumn]
-        const primaryID = row[this.primaryIDColumn]
-        if (primaryID in this.settings.selectedMap) {
-          for (const category of this.settings.selectedMap[primaryID]) {
-            temp[category]["x"].push(fc)
-            temp[category]["y"].push(pValue)
-            temp[category]["text"].push(primaryID)
-          }
-        } else if (this.settings.backGroundColorGrey) {
-          temp["Background"]["x"].push(fc)
-          temp["Background"]["y"].push(pValue)
-          temp["Background"]["text"].push(primaryID)
-        } else {
-          const group = this.dataService.significantGroup(pValue, fc, this.settings.pCutOff, this.settings.fcCutOff)
-          if (!(group in temp)) {
-            if (!(group in this.settings.colorMap)) {
-              this.settings.colorMap[group] = this.dataService.palette.pastel[currentPosition]
-              currentPosition ++
-              if (currentPosition === this.dataService.palette.pastel.length) {
-                currentPosition = 0
-              }
+      const fc = row[this.fcColumn]
+      const pValue = row[this.pValueColumn]
+      const primaryID = row[this.primaryIDColumn]
+      if (primaryID in this.settings.selectedMap) {
+        for (const category of this.settings.selectedMap[primaryID]) {
+          temp[category]["x"].push(fc)
+          temp[category]["y"].push(pValue)
+          temp[category]["text"].push(primaryID)
+        }
+      } else if (this.settings.backgroundColorGrey) {
+        temp["Background"]["x"].push(fc)
+        temp["Background"]["y"].push(pValue)
+        temp["Background"]["text"].push(primaryID)
+      } else {
+        const group = this.dataService.significantGroup(fc, pValue, this.settings.pCutOff, this.settings.fcCutOff)
+        if (!(group in temp)) {
+          if (!(group in this.settings.colorMap)) {
+            this.settings.colorMap[group] = this.dataService.palette.pastel[currentPosition]
+            currentPosition ++
+            if (currentPosition === this.dataService.palette.pastel.length) {
+              currentPosition = 0
             }
-            temp[group] = {
-              x: [],
-              y: [],
-              text: [],
-              type: "scattergl",
-              mode: "markers",
-              name: group,
-              marker: {
-                color: this.settings.colorMap[group],
-              }
+          }
+          temp[group] = {
+            x: [],
+            y: [],
+            text: [],
+            type: "scattergl",
+            mode: "markers",
+            name: group,
+            marker: {
+              color: this.settings.colorMap[group],
+              size: this.settings.pointSize
             }
           }
         }
+        temp[group]["x"].push(fc)
+        temp[group]["y"].push(pValue)
+        temp[group]["text"].push(primaryID)
       }
     })
+    const graphData: any[] = []
+    for (const t in temp) {
+      if (temp[t].x.length > 0) {
+        graphData.push(temp[t])
+      }
+    }
 
+    this.modifyLayout()
 
+    this.graphData = graphData.reverse()
+    this.colorKeys = Object.keys(this.settings.colorMap)
+    this.form.markAsPristine()
   }
 
   prepareCategories() {
@@ -141,10 +195,11 @@ export class VolcanoPlotComponent {
       mode: "markers",
       name: "Background"
     }
-    if (this.settings.backGroundColorGrey) {
+    if (this.settings.backgroundColorGrey) {
       temp["Background"]["marker"] = {
         color: "#a4a2a2",
         opacity: 0.3,
+        size: this.settings.pointSize
       }
     }
 
@@ -180,10 +235,66 @@ export class VolcanoPlotComponent {
         mode: "markers",
         name: s,
         marker: {
-          color: this.settings.colorMap[s]
+          color: this.settings.colorMap[s],
+          size: this.settings.pointSize
         }
       }
     }
     return temp
+  }
+
+  modifyLayout() {
+    const cutOff: any[] = []
+    cutOff.push({
+      type: "line",
+      x0: -this.settings.fcCutOff,
+      x1: -this.settings.fcCutOff,
+      y0: 0,
+      y1: this.graphLayout.yaxis.range[1],
+      line: {
+        color: 'rgb(21,4,4)',
+        width: 1,
+        dash: 'dot'
+      }
+    })
+    cutOff.push({
+      type: "line",
+      x0: this.settings.fcCutOff,
+      x1: this.settings.fcCutOff,
+      y0: 0,
+      y1: this.graphLayout.yaxis.range[1],
+      line: {
+        color: 'rgb(21,4,4)',
+        width: 1,
+        dash: 'dot'
+      }
+    })
+
+    let x0 = this.layoutMaxMin.xMin - 1
+    if (this.settings.volcanoAxis.minX) {
+      x0 = this.settings.volcanoAxis.minX - 1
+    }
+    let x1 = this.layoutMaxMin.xMax + 1
+    if (this.settings.volcanoAxis.maxX) {
+      x1 = this.settings.volcanoAxis.maxX + 1
+    }
+    cutOff.push({
+      type: "line",
+      x0: x0,
+      x1: x1,
+      y0: -Math.log10(this.settings.pCutOff),
+      y1: -Math.log10(this.settings.pCutOff),
+      line: {
+        color: 'rgb(21,4,4)',
+        width: 1,
+        dash: 'dot'
+      }
+    })
+    console.log(cutOff)
+    this.graphLayout.shapes = cutOff
+  }
+
+  markAsDirty() {
+    this.form.markAsDirty()
   }
 }

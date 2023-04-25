@@ -32,8 +32,8 @@
       <ng-container *ngSwitchCase="'box-plot'">
         <app-box-plot-form [columns]="selectedDF.getColumnNames()" #box></app-box-plot-form>
       </ng-container>
-      <ng-container *ngSwitchCase="'heatmap'">
-        <app-heatmap-form [columns]="selectedDF.getColumnNames()" #heatmap></app-heatmap-form>
+      <ng-container *ngSwitchCase="'correlation-matrix'">
+        <app-correlation-matrix-form [columns]="selectedDF.getColumnNames()" #correlationMatrix></app-correlation-matrix-form>
       </ng-container>
       <ng-container *ngSwitchCase="'line-chart'">
         <app-line-chart-form [columns]="selectedDF.getColumnNames()" #line></app-line-chart-form>

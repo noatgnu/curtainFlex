@@ -1,1 +1,3 @@
-<p>plot-compositor works!</p>
+<ng-container *ngFor="let plot of dataService.plotLists; let ind = index">
+  <app-plot-container class="p-2" [data]="plot" [position]="ind"></app-plot-container>
+</ng-container>

@@ -7,13 +7,17 @@ import {FormBuilder} from "@angular/forms";
   styleUrls: ['./bar-chart-form.component.less']
 })
 export class BarChartFormComponent {
-  @Input() columns: string[] = []
+  private _columns: string[] = []
+  @Input() set columns(value: string[]) {
+    this._columns = value
+  }
 
+  get columns(): string[] {
+    return this._columns
+  }
   form = this.fb.group({
     primaryID: [''],
-    xAxis: [[]],
-    xAxisIsSamples: [true],
-    yAxis: [''],
+    samples: [[]],
   })
 
   constructor(private fb: FormBuilder) { }

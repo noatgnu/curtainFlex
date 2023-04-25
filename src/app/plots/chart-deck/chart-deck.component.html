@@ -1,0 +1,7 @@
+
+
+<ng-container *ngFor="let plot of plotDataArray">
+  <ng-container [ngSwitch]="plot.plotType">
+    <app-bar-chart *ngSwitchCase="'bar-chart'" [data]="plot"></app-bar-chart>
+  </ng-container>
+</ng-container>

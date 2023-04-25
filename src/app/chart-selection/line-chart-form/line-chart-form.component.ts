@@ -7,11 +7,17 @@ import {FormBuilder} from "@angular/forms";
   styleUrls: ['./line-chart-form.component.less']
 })
 export class LineChartFormComponent {
-  @Input() columns: string[] = []
+  private _columns: string[] = []
+  @Input() set columns(value: string[]) {
+    this._columns = value
+  }
+
+  get columns(): string[] {
+    return this._columns
+  }
   form = this.fb.group({
     primaryID: [''],
-    xAxis: [''],
-    yAxis: [''],
+    samples: [[]],
   })
   constructor(private fb: FormBuilder) { }
 }

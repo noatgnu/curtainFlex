@@ -1,9 +1,45 @@
-<ng-container [ngSwitch]="data.plotType">
-  <ng-container *ngSwitchCase="'volcano-plot'">
-    <div class="card">
-      <div class="card-body">
-        <app-volcano-plot [data]="data"></app-volcano-plot>
+
+
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex flex-row-reverse">
+        <div class="p-2">
+          <button class="btn btn-danger" [ngbTooltip]="'Remove section'" (click)="dataService.removePlot(data.settings.id)">
+          <span>
+            <i class="bi-x"></i>
+          </span>
+          </button>
+        </div>
+        <form class="d-flex p-2" role="search">
+          <input class="form-control me-2" type="search" placeholder="Protein of interests" aria-label="Search">
+          <button class="btn btn-outline-primary" type="submit">Search</button>
+        </form>
+        <div class="p-2">
+          <button class="btn btn-outline-primary" (click)="openBatchSearchModal()">Batch Search</button>
+        </div>
+        <div class="p-2" *ngIf="(dataService.plotLists.length -1) > position">
+          <button class="btn btn-primary" (click)="dataService.movePlotDown(data.settings.id)" [ngbTooltip]="'Move section downward'">
+            <span>
+              <i class="bi-arrow-down"></i>
+            </span>
+          </button>
+        </div>
+        <div class="p-2" *ngIf="position !== 0">
+          <button class="btn btn-primary" (click)="dataService.movePlotUp(data.settings.id)" [ngbTooltip]="'Move section upward'">
+            <span>
+              <i class="bi-arrow-up"></i>
+            </span>
+          </button>
+        </div>
       </div>
+      <ng-container *ngIf="data.plotType !== ''">
+        <ng-container [ngSwitch]="data.plotType">
+          <app-volcano-plot [data]="data" *ngSwitchCase="'volcano-plot'" (formChanged)="updateFormChangeStatus($event)" ></app-volcano-plot>
+          <app-chart-deck [data]="data" *ngSwitchDefault></app-chart-deck>
+        </ng-container>
+      </ng-container>
     </div>
-  </ng-container>
-</ng-container>
+  </div>
+
+</div>

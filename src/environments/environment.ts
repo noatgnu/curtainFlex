@@ -3,7 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  orcid: "APP-5RXLC3W1MS2MOW0F",
+  apiURL: "https://celsus.muttsu.xyz/",
 };
 
 /*

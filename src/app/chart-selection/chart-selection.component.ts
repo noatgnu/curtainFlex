@@ -4,20 +4,20 @@ import {FormArray, FormBuilder} from "@angular/forms";
 import {InputFile} from "../classes/input-file";
 import {DataFrame, IDataFrame, Series} from "data-forge";
 import {VolcanoPlotFormComponent} from "./volcano-plot-form/volcano-plot-form.component";
-import {HeatmapFormComponent} from "./heatmap-form/heatmap-form.component";
+import {CorrelationMatrixFormComponent} from "./correlation-matrix/correlation-matrix-form.component";
 import {ScatterPlotFormComponent} from "./scatter-plot-form/scatter-plot-form.component";
 import {BarChartFormComponent} from "./bar-chart-form/bar-chart-form.component";
 import {LineChartFormComponent} from "./line-chart-form/line-chart-form.component";
 import {BoxPlotFormComponent} from "./box-plot-form/box-plot-form.component";
 
 @Component({
-  selector: 'app-chart-selection',
+  selector: 'app-cha rt-selection',
   templateUrl: './chart-selection.component.html',
   styleUrls: ['./chart-selection.component.less']
 })
 export class ChartSelectionComponent implements AfterViewInit{
   @ViewChild(VolcanoPlotFormComponent) volcano: VolcanoPlotFormComponent | undefined
-  @ViewChild(HeatmapFormComponent) heatmap: HeatmapFormComponent | undefined
+  @ViewChild(CorrelationMatrixFormComponent) correlationMatrix: CorrelationMatrixFormComponent | undefined
   @ViewChild(ScatterPlotFormComponent) scatter: ScatterPlotFormComponent | undefined
   @ViewChild(BarChartFormComponent) bar: BarChartFormComponent | undefined
   @ViewChild(LineChartFormComponent) line: LineChartFormComponent | undefined
@@ -40,7 +40,7 @@ export class ChartSelectionComponent implements AfterViewInit{
 
   plotTypeList = [
     {name: 'Volcano Plot', value: 'volcano-plot'},
-    {name: 'Heatmap', value: 'heatmap'},
+    {name: 'Correlation Matrix', value: 'correlation-matrix'},
     {name: 'Scatter Plot', value: 'scatter-plot'},
     {name: 'Bar Chart', value: 'bar-chart'},
     {name: 'Line Chart', value: 'line-chart'},
@@ -80,8 +80,8 @@ export class ChartSelectionComponent implements AfterViewInit{
     return this.volcano?.form
   }
 
-  get heatmapForm() {
-    return this.heatmap?.form
+  get correlationMatrixForm() {
+    return this.correlationMatrix?.form
   }
 
   get scatterForm() {
@@ -105,7 +105,7 @@ export class ChartSelectionComponent implements AfterViewInit{
       case 'volcano-plot':
         return this.volcanoForm?.value
       case 'heatmap':
-        return this.heatmapForm?.value
+        return this.correlationMatrixForm?.value
       case 'scatter-plot':
         return this.scatterForm?.value
       case 'bar-chart':

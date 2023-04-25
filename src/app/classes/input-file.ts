@@ -5,6 +5,7 @@ export class InputFile {
   filename: string = "";
   other: any = {};
   originalFile: string = "";
+  extraMetaDataDBID: string = "";
   constructor(df?: IDataFrame, filename?: string, originalFile?: string, other?: any) {
     if (df) {
       this.df = df;

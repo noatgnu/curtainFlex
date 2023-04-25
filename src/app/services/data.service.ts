@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {IDataFrame, Series} from "data-forge";
 import {Subject} from "rxjs";
+import {PlotData} from "../interface/plot-data";
 
 @Injectable({
   providedIn: 'root'
@@ -8,19 +9,21 @@ import {Subject} from "rxjs";
 export class DataService {
   plotsSubject: Subject<any> = new Subject<any>()
 
-  plotLists: any[] = []
+  plotLists: PlotData[] = []
+
+  extraMetaData: Map<string, any> = new Map<string, any>()
 
   constructor() { }
 
   processForm(data: IDataFrame, form: any, plotType: string): {form: any, samples: {sample: string, replicate: string, column: string}[], data: IDataFrame, plotType: string} {
-    let samples: {sample: string, replicate: string, column: string}[] = []
+    let samples: {condition: string, replicate: string, column: string}[] = []
     let result: any = {}
     switch (plotType) {
       case 'volcano-plot':
         result = this.processVolcanoPlotForm(form, data, samples);
         break;
       case 'heatmap':
-        result = this.processHeatmapForm(form, data, samples);
+        result = this.processCorrelationMatrixForm(form, data, samples);
         break
       case 'scatter-plot':
         result = this.processScatterPlotForm(form, data, samples);
@@ -39,7 +42,7 @@ export class DataService {
     return result
   }
 
-  addPlotToList(plot: any) {
+  addPlotToList(plot: PlotData) {
     this.plotsSubject.next(plot)
     this.plotLists.push(plot)
   }
@@ -47,7 +50,7 @@ export class DataService {
 
 
   private processVolcanoPlotForm(form: any, data: IDataFrame<number, any>, samples: {
-    sample: string;
+    condition: string;
     replicate: string;
     column: string
   }[]) {
@@ -66,8 +69,8 @@ export class DataService {
     return {form: form, samples: samples, data: data}
   }
 
-  private processHeatmapForm(form: any, data: IDataFrame<number, any>, samples: {
-    sample: string;
+  private processCorrelationMatrixForm(form: any, data: IDataFrame<number, any>, samples: {
+    condition: string;
     replicate: string;
     column: string
   }[]) {
@@ -77,9 +80,9 @@ export class DataService {
       samples = form["samples"].map((sample: string) => {
         const split = sample.split('.')
         if (split.length > 1) {
-          return {sample: split.slice(0, split.length - 2) ,replicate: split[split.length - 1], column: sample}
+          return {condition: split.slice(0, split.length - 1).join("_") ,replicate: split[split.length - 1], column: sample}
         } else {
-          return {sample: sample, replicate: '', column: sample}
+          return {condition: sample, replicate: '', column: sample}
         }
       })
       for (const sample of samples) {
@@ -114,16 +117,25 @@ export class DataService {
     return newCol
   }
 
-  private processScatterPlotForm(form: any, data: IDataFrame, samples: {sample: string; replicate: string; column: string}[]) {
-    if (form["xAxis"]) {
+  private processScatterPlotForm(form: any, data: IDataFrame, samples: {condition: string; replicate: string; column: string}[]) {
+
+    data = data.withSeries(form["xAxis"], new Series(this.convertToNumber(data.getSeries(form["xAxis"]).toArray()))).bake()
+    data = data.withSeries(form["yAxis"], new Series(this.convertToNumber(data.getSeries(form["yAxis"]).toArray()))).bake()
+
+    return {form: form, samples: samples, data: data}
+  }
+
+  private processBarChartForm(form: any, data: IDataFrame, samples: {condition: string; replicate: string; column: string}[]) {
+    if (form["samples"]) {
       // Split the sample label into condition and replicate id by the last period
       // @ts-ignore
-      samples = form["xAxis"].map((sample: string) => {
+      samples = form["samples"].map((sample: string) => {
         const split = sample.split('.')
+        console.log(split)
         if (split.length > 1) {
-          return {sample: split.slice(0, split.length - 2) ,replicate: split[split.length - 1], column: sample}
+          return {condition: split.slice(0, split.length - 1).join("_") ,replicate: split[split.length - 1], column: sample}
         } else {
-          return {sample: sample, replicate: '', column: sample}
+          return {condition: sample, replicate: '', column: sample}
         }
       })
     }
@@ -133,16 +145,16 @@ export class DataService {
     return {form: form, samples: samples, data: data}
   }
 
-  private processBarChartForm(form: any, data: IDataFrame, samples: {sample: string; replicate: string; column: string}[]) {
-    if (form["xAxis"]) {
+  private processLineChartForm(form: any, data: IDataFrame, samples: {condition: string; replicate: string; column: string}[]) {
+    if (form["samples"]) {
       // Split the sample label into condition and replicate id by the last period
       // @ts-ignore
-      samples = form["xAxis"].map((sample: string) => {
+      samples = form["samples"].map((sample: string) => {
         const split = sample.split('.')
         if (split.length > 1) {
-          return {sample: split.slice(0, split.length - 2) ,replicate: split[split.length - 1], column: sample}
+          return {condition: split.slice(0, split.length - 1).join("_") ,replicate: split[split.length - 1], column: sample}
         } else {
-          return {sample: sample, replicate: '', column: sample}
+          return {condition: sample, replicate: '', column: sample}
         }
       })
     }
@@ -152,35 +164,16 @@ export class DataService {
     return {form: form, samples: samples, data: data}
   }
 
-  private processLineChartForm(form: any, data: IDataFrame, samples: {sample: string; replicate: string; column: string}[]) {
-    if (form["xAxis"]) {
+  private processBoxPlotForm(form: any, data: IDataFrame, samples: {condition: string; replicate: string; column: string}[]) {
+    if (form["samples"]) {
       // Split the sample label into condition and replicate id by the last period
       // @ts-ignore
-      samples = form["xAxis"].map((sample: string) => {
+      samples = form["samples"].map((sample: string) => {
         const split = sample.split('.')
         if (split.length > 1) {
-          return {sample: split.slice(0, split.length - 2) ,replicate: split[split.length - 1], column: sample}
+          return {condition: split.slice(0, split.length - 1).join("_") ,replicate: split[split.length - 1], column: sample}
         } else {
-          return {sample: sample, replicate: '', column: sample}
-        }
-      })
-    }
-    for (const sample of samples) {
-      data = data.withSeries(sample.column, new Series(this.convertToNumber(data.getSeries(sample.column).toArray()))).bake()
-    }
-    return {form: form, samples: samples, data: data}
-  }
-
-  private processBoxPlotForm(form: any, data: IDataFrame, samples: {sample: string; replicate: string; column: string}[]) {
-    if (form["xAxis"]) {
-      // Split the sample label into condition and replicate id by the last period
-      // @ts-ignore
-      samples = form["xAxis"].map((sample: string) => {
-        const split = sample.split('.')
-        if (split.length > 1) {
-          return {sample: split.slice(0, split.length - 2) ,replicate: split[split.length - 1], column: sample}
-        } else {
-          return {sample: sample, replicate: '', column: sample}
+          return {condition: sample, replicate: '', column: sample}
         }
       })
     }
@@ -240,6 +233,7 @@ export class DataService {
   }
 
   defaultVolcanoPlotOptions: any = {
+    id: "",
     plotTitle: "Volcano Plot",
     colorMap: {},
     categories: [],
@@ -250,10 +244,60 @@ export class DataService {
     fcCutOff: 0.6,
   }
 
+  defaultBarChartOptions: any = {
+    plotTitle: "Bar Chart",
+    colorMap: {},
+    sampleVisibility: {},
+    categories: [],
+    selectedMap: {},
+  }
+
   getDefaultsPlotOptions(plotType: string) {
+    let settings: any = {}
     switch (plotType) {
       case "volcano-plot":
-        return this.defaultVolcanoPlotOptions
+        settings = this.defaultVolcanoPlotOptions
+        break
+      case "bar-chart":
+        settings = this.defaultBarChartOptions
+        break
+    }
+    settings["id"] = crypto.randomUUID()
+    return settings
+  }
+
+  saveSession() {
+
+  }
+
+  movePlotUp(plotId: string) {
+    for (let index = 0; index < this.plotLists.length; index++) {
+      if (this.plotLists[index].settings.id === plotId) {
+        this.moveElementInArray(this.plotLists, index, index - 1)
+        break
+      }
+    }
+  }
+
+  movePlotDown(plotId: string) {
+    for (let index = 0; index < this.plotLists.length; index++) {
+      if (this.plotLists[index].settings.id === plotId) {
+        this.moveElementInArray(this.plotLists, index, index + 1)
+        break
+      }
+    }
+  }
+
+  moveElementInArray(array: any[], from: number, to: number) {
+    array.splice(to, 0, array.splice(from, 1)[0]);
+  }
+
+  removePlot(plotId: string) {
+    for (let index = 0; index < this.plotLists.length; index++) {
+      if (this.plotLists[index].settings.id === plotId) {
+        this.plotLists.splice(index, 1)
+        break
+      }
     }
   }
 }

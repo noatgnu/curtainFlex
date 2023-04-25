@@ -7,6 +7,7 @@ import {DataService} from "../../services/data.service";
   styleUrls: ['./plot-compositor.component.less']
 })
 export class PlotCompositorComponent {
+
   constructor(public dataService: DataService) {
 
   }
