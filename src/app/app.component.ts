@@ -71,11 +71,7 @@ export class AppComponent implements OnInit{
       const select = this.modal.open(SelectExtraMetadataModalComponent)
       select.componentInstance.data = df.df
       select.componentInstance.filenameList = this.data.filenameList.filter((value) => {
-        if (this.data.files.get(value)?.extraMetaDataDBID && this.data.files.get(value)?.extraMetaDataDBID !== "" && value !== fileName) {
-          return true
-        } else {
-          return false
-        }
+        return !!(this.data.files.get(value)?.extraMetaDataDBID && this.data.files.get(value)?.extraMetaDataDBID !== "" && value !== fileName);
       })
       select.closed.subscribe((result) => {
         if (result) {

@@ -73,7 +73,6 @@ export class ChartSelectionComponent implements AfterViewInit{
 
   ngAfterViewInit() {
     this.changeDetectorRef.detectChanges()
-    console.log(this.form)
   }
 
   get volcanoForm() {
