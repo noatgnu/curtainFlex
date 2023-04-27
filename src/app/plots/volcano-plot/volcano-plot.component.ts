@@ -48,16 +48,21 @@ export class VolcanoPlotComponent {
   }
 
   df: IDataFrame = new DataFrame()
-
+  extraMetaDataDBID: string = ""
   @Input() set data(value: PlotData) {
     this.fcColumn = value.form.foldChange
     this.pValueColumn = value.form.minuslog10pValue
     this.primaryIDColumn = value.form.primaryID
     this.settings = value.settings
+    if (value.extraMetaDataDBID) {
+      this.extraMetaDataDBID = value.extraMetaDataDBID
+      console.log(this.extraMetaDataDBID)
+      console.log(this.dataService.extraMetaData.get(this.extraMetaDataDBID))
+    }
     this.form.controls['plotTitle'].setValue(this.settings.plotTitle)
     this.form.controls['pCutOff'].setValue(this.settings.pCutOff)
     this.form.controls['fcCutOff'].setValue(this.settings.fcCutOff)
-    this.form.controls['backgroundColorGrey'].setValue(this.settings.backGroundColorGrey)
+    this.form.controls['backgroundColorGrey'].setValue(this.settings.backgroundColorGrey)
     this.df = value.df
     this.drawGraph()
   }
@@ -100,7 +105,7 @@ export class VolcanoPlotComponent {
     this.settings.manualAxis = this.form.value['manualAxis']
     this.settings.pCutOff = this.form.value['pCutOff']
     this.settings.fcCutOff = this.form.value['fcCutOff']
-    this.settings.backGroundColorGrey = this.form.value['backgroundColorGrey']
+    this.settings.backgroundColorGrey = this.form.value['backgroundColorGrey']
     this.settings.pointSize = this.form.value['pointSize']
 
 
@@ -124,20 +129,28 @@ export class VolcanoPlotComponent {
       this.graphLayout.yaxis.range[1] = this.settings.volcanoAxis.maxY
     }
     let currentPosition = 0
-    this.df.forEach((row:any) => {
+    for (const row of this.df) {
       const fc = row[this.fcColumn]
       const pValue = row[this.pValueColumn]
       const primaryID = row[this.primaryIDColumn]
+      let dataText = primaryID
+      if (this.extraMetaDataDBID) {
+        const extra = this.dataService.getExtraMetaData(primaryID, this.extraMetaDataDBID)
+        if (extra) {
+          dataText = `${extra["Gene Names"]}<br>${primaryID}`
+        }
+      }
+      console.log(this.settings)
       if (primaryID in this.settings.selectedMap) {
         for (const category of this.settings.selectedMap[primaryID]) {
           temp[category]["x"].push(fc)
           temp[category]["y"].push(pValue)
-          temp[category]["text"].push(primaryID)
+          temp[category]["text"].push(dataText)
         }
       } else if (this.settings.backgroundColorGrey) {
         temp["Background"]["x"].push(fc)
         temp["Background"]["y"].push(pValue)
-        temp["Background"]["text"].push(primaryID)
+        temp["Background"]["text"].push(dataText)
       } else {
         const group = this.dataService.significantGroup(fc, pValue, this.settings.pCutOff, this.settings.fcCutOff)
         if (!(group in temp)) {
@@ -163,9 +176,9 @@ export class VolcanoPlotComponent {
         }
         temp[group]["x"].push(fc)
         temp[group]["y"].push(pValue)
-        temp[group]["text"].push(primaryID)
+        temp[group]["text"].push(dataText)
       }
-    })
+    }
     const graphData: any[] = []
     for (const t in temp) {
       if (temp[t].x.length > 0) {
@@ -177,6 +190,7 @@ export class VolcanoPlotComponent {
 
     this.graphData = graphData.reverse()
     this.colorKeys = Object.keys(this.settings.colorMap)
+    console.log(this.graphData)
     this.form.markAsPristine()
   }
 
@@ -193,10 +207,8 @@ export class VolcanoPlotComponent {
       text: [],
       type: "scattergl",
       mode: "markers",
-      name: "Background"
-    }
-    if (this.settings.backgroundColorGrey) {
-      temp["Background"]["marker"] = {
+      name: "Background",
+      marker: {
         color: "#a4a2a2",
         opacity: 0.3,
         size: this.settings.pointSize
@@ -290,7 +302,6 @@ export class VolcanoPlotComponent {
         dash: 'dot'
       }
     })
-    console.log(cutOff)
     this.graphLayout.shapes = cutOff
   }
 

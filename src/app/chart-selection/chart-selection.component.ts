@@ -119,6 +119,8 @@ export class ChartSelectionComponent implements AfterViewInit{
   }
 
   submit() {
-    this.activeModal.close({data: this.selectedDF, form: this.form, plotType: this.selectedPlotType})
+    if (this.data.files.get(this.selectedFile)) {
+      this.activeModal.close({data: this.data.files.get(this.selectedFile), form: this.form, plotType: this.selectedPlotType})
+    }
   }
 }

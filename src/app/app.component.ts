@@ -18,10 +18,9 @@ import {UniprotService} from "./services/uniprot.service";
 export class AppComponent implements OnInit{
   title = 'Curtain Flex';
   settings: any = {files: {}}
-  data: {files: Map<string, InputFile>, filenameList: string[]} = {files: new Map<string, InputFile>(), filenameList: []}
 
 
-  constructor(private modal: NgbModal, private dataService: DataService) { }
+  constructor(private modal: NgbModal, public dataService: DataService) { }
 
   ngOnInit(): void {
 
@@ -34,9 +33,9 @@ export class AppComponent implements OnInit{
         reader.onload = (event) => {
           const loadedFile = reader.result;
           if (target.files) {
-            this.data.files.set(target.files[0].name, new InputFile(fromCSV(<string>loadedFile), target.files[0].name, <string>loadedFile))
-            this.data.filenameList.push(target.files[0].name)
-            if (this.data.files.has(target.files[0].name)) {
+            this.dataService.data.files.set(target.files[0].name, new InputFile(fromCSV(<string>loadedFile), target.files[0].name, <string>loadedFile))
+            this.dataService.data.filenameList.push(target.files[0].name)
+            if (this.dataService.data.files.has(target.files[0].name)) {
               this.openSelectExtraMetadataModal(target.files[0].name)
             }
           }
@@ -49,9 +48,9 @@ export class AppComponent implements OnInit{
 
   openChartSelection() {
     const modalRef = this.modal.open(ChartSelectionComponent);
-    modalRef.componentInstance.data = this.data
+    modalRef.componentInstance.data = this.dataService.data
     modalRef.closed.subscribe((result) => {
-      const results = this.dataService.processForm(result.data, result.form, result.plotType)
+      const results = this.dataService.processForm(result.data.df, result.form, result.plotType)
       const defaultSettings: any = this.dataService.getDefaultsPlotOptions(result.plotType)
       if ("sampleVisibility" in defaultSettings) {
         for (const sample of results.samples) {
@@ -59,37 +58,36 @@ export class AppComponent implements OnInit{
         }
       }
 
-      const plotSettings: PlotData = {df: results.data, form: result.form, settings: defaultSettings, plotType: result.plotType, samples: results.samples}
+      const plotSettings: PlotData = {df: results.data, form: result.form, settings: defaultSettings, plotType: result.plotType, samples: results.samples, extraMetaDataDBID: result.data.extraMetaDataDBID}
 
       this.dataService.addPlotToList(plotSettings)
     })
   }
 
   openSelectExtraMetadataModal(fileName: string) {
-    const df = this.data.files.get(fileName)
+    const df = this.dataService.data.files.get(fileName)
     if (df) {
       const select = this.modal.open(SelectExtraMetadataModalComponent)
       select.componentInstance.data = df.df
-      select.componentInstance.filenameList = this.data.filenameList.filter((value) => {
-        return !!(this.data.files.get(value)?.extraMetaDataDBID && this.data.files.get(value)?.extraMetaDataDBID !== "" && value !== fileName);
+      select.componentInstance.filenameList = this.dataService.data.filenameList.filter((value) => {
+        return !!(this.dataService.data.files.get(value)?.extraMetaDataDBID && this.dataService.data.files.get(value)?.extraMetaDataDBID !== "" && value !== fileName);
       })
       select.closed.subscribe((result) => {
         if (result) {
           if (result.form.enableLink) {
             if (result.form.linkTo) {
-              const df2 = this.data.files.get(result.form.linkTo)
+              const df2 = this.dataService.data.files.get(result.form.linkTo)
               if (df2) {
                 df.extraMetaDataDBID = df2.extraMetaDataDBID
               }
             }
           } else {
-            df.extraMetaDataDBID = crypto.randomUUID()
+            df.extraMetaDataDBID = fileName
 
             this.dataService.extraMetaData.set(df.extraMetaDataDBID, result)
           }
         }
       })
     }
-
   }
 }

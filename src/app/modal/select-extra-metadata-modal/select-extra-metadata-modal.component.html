@@ -11,9 +11,16 @@
         <option value="uniprot">Uniprot</option>
       </select>
     </div>
+
     <div class="form-group" *ngIf="form.value['enableLink']===false">
       <label for="column">Column with accession ids</label>
       <select id="column" formControlName="column" class="form-control">
+        <option *ngFor="let c of data.getColumnNames()" [value]="c">{{c}}</option>
+      </select>
+    </div>
+    <div class="form-group" *ngIf="form.value['enableLink']===false">
+      <label for="primaryID">Column with unique primary id to be used as index</label>
+      <select id="PrimaryID" formControlName="primaryID" class="form-control">
         <option *ngFor="let c of data.getColumnNames()" [value]="c">{{c}}</option>
       </select>
     </div>

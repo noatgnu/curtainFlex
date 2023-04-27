@@ -6,6 +6,7 @@ export interface PlotData {
   settings: any;
   samples: any[];
   plotType: string;
+  extraMetaDataDBID?: string;
 }
 
 export interface PlotDataGeneric {
@@ -14,4 +15,5 @@ export interface PlotDataGeneric {
   settings: any;
   samples: any[];
   plotType: string;
+  extraMetaDataDBID?: string;
 }

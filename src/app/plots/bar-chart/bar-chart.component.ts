@@ -47,10 +47,19 @@ export class BarChartComponent {
 
   samples: any[] = []
 
+  extraMetaDataDBID: string = ""
+
   @Input() set data(value: PlotDataGeneric) {
     this.samples = value.samples
     this.settings = value.settings
     this.df = value.df
+    if (value.extraMetaDataDBID) {
+      this.extraMetaDataDBID = value.extraMetaDataDBID
+      const data = this.dataService.getExtraMetaData(value.df[value.form.primaryID], this.extraMetaDataDBID)
+      if (data) {
+        this.settings.plotTitle = `${data["Gene Names"]}<br>${value.df[value.form.primaryID]}`
+      }
+    }
     this.drawGraph()
   }
 
@@ -59,6 +68,8 @@ export class BarChartComponent {
   }
 
   drawGraph() {
+
+
     this.graphLayout.title.text = this.settings.plotTitle
     const tickvals: string[] = []
     const ticktext: string[] = []

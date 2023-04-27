@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import {IDataFrame, Series} from "data-forge";
 import {Subject} from "rxjs";
 import {PlotData} from "../interface/plot-data";
+import {InputFile} from "../classes/input-file";
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
   plotsSubject: Subject<any> = new Subject<any>()
-
+  data: {files: Map<string, InputFile>, filenameList: string[]} = {files: new Map<string, InputFile>(), filenameList: []}
   plotLists: PlotData[] = []
 
   extraMetaData: Map<string, any> = new Map<string, any>()
@@ -238,7 +239,7 @@ export class DataService {
     colorMap: {},
     categories: [],
     volcanoAxis: {minX: 0, maxX: 0, minY: 0, maxY: 0},
-    backGroundColorGrey: false,
+    backgroundColorGrey: false,
     selectedMap: {},
     pCutOff: 0.05,
     fcCutOff: 0.6,
@@ -299,5 +300,33 @@ export class DataService {
         break
       }
     }
+  }
+
+  getExtraMetaData(primaryID: string, extraMetaDataDBID: string) {
+    const df = this.data.files.get(extraMetaDataDBID)
+    const meta = this.extraMetaData.get(extraMetaDataDBID)
+    if (df && meta) {
+      const data = meta.primaryIDMap.get(primaryID)
+      if (data) {
+        return this.getExtraMetaDataFromColumn(data, meta)
+      }
+    }
+    return null
+  }
+
+  getExtraMetaDataFromColumn(id: string, extraMetaDataDB: any) {
+    const a = extraMetaDataDB.accMap.get(id)
+    if (a) {
+      const res = a.filter((val: any) => {
+        return !!extraMetaDataDB.dataMap.has(val);
+      })
+      if (res.length >0) {
+        const metaRow = extraMetaDataDB.db.get(res[0])
+        if (metaRow) {
+          return metaRow
+        }
+      }
+    }
+    return null
   }
 }

@@ -17,6 +17,7 @@ export class SelectExtraMetadataModalComponent {
   @Input() set data(value: IDataFrame) {
     this._data = value
     this.form.controls["column"].setValue(this._data.getColumnNames()[0])
+    this.form.controls["primaryID"].setValue(this._data.getColumnNames()[0])
   }
 
   get data(): IDataFrame {
@@ -35,6 +36,7 @@ export class SelectExtraMetadataModalComponent {
   form = this.fb.group({
     source: ["uniprot", ],
     column: ["", ],
+    primaryID: ["", ],
     linkTo: ["",],
     enableLink: [false,],
   })
@@ -46,44 +48,57 @@ export class SelectExtraMetadataModalComponent {
   }
 
   submit() {
-
-    if (this.form.value["column"]) {
-      const accMap = new Map<string, string[]>()
-      const extraMap = new Map<string, string>()
-      const accs: string[] = []
-      for (const r of this.data) {
-        const accSplit = r[this.form.value["column"]].split(";")
-        accMap.set(this.form.value["column"], [this.form.value["column"]])
-        for (const acc of accSplit) {
-          if (!accMap.has(acc)) {
-            accMap.set(acc, [this.form.value["column"]])
-          } else {
-            const accList = accMap.get(acc)
-            if (accList) {
-              accList.push(this.form.value["column"])
-              accMap.set(acc, accList)
+    if (!this.form.value["enableLink"]) {
+      if (this.form.value["column"] && this.form.value["primaryID"]) {
+        const accMap = new Map<string, string[]>()
+        const primaryIDMap = new Map<string, string[]>()
+        const accs: string[] = []
+        for (const r of this.data) {
+          primaryIDMap.set(r[this.form.value["primaryID"]], r[this.form.value["column"]])
+          const accSplit = r[this.form.value["column"]].split(";")
+          accMap.set(r[this.form.value["column"]], [r[this.form.value["column"]]])
+          for (const acc of accSplit) {
+            if (!accMap.has(acc)) {
+              accMap.set(acc, [r[this.form.value["column"]]])
+            } else {
+              const accList = accMap.get(acc)
+              if (accList) {
+                const checkIfExist = accList.find(value => value === acc)
+                if (checkIfExist === undefined) {
+                  accList.push(r[this.form.value["column"]])
+                  accMap.set(acc, accList)
+                }
+              }
             }
           }
+          switch (this.form.value["source"]) {
+            case "uniprot":
+              const accession = new Accession(accSplit[0], true)
+              if (accession.acc) {
+                const accList = accMap.get(r[this.form.value["column"]])
+                if (accList) {
+                  accList.push(accession.acc)
+                  accMap.set(r[this.form.value["column"]], accList)
+                }
+                accs.push(accession.acc)
+              }
+              break
+          }
         }
-        switch (this.form.value["source"]) {
-          case "uniprot":
-            const accession = new Accession(accSplit[0], true)
-            if (accession.acc) {
-              accs.push(accession.acc)
-            }
-            break
+        if (accs.length > 0) {
+          switch (this.form.value["source"]) {
+            case "uniprot":
+              this.getUniprot(accs, accMap).then((result) => {
+                this.modal.close({db: result.db, dataMap: result.dataMap, form: this.form.value, accMap: accMap, primaryIDMap: primaryIDMap})
+              })
+              break
+          }
         }
       }
-      if (accs.length > 0) {
-        switch (this.form.value["source"]) {
-          case "uniprot":
-            this.getUniprot(accs, accMap).then((result) => {
-              this.modal.close({db: result.db, dataMap: result.dataMap, form: this.form.value})
-            })
-            break
-        }
-      }
+    } else {
+      this.modal.close({form: this.form.value})
     }
+
   }
 
 

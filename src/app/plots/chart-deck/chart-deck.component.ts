@@ -42,7 +42,8 @@ export class ChartDeckComponent {
             form: this._data.form,
             settings: this._data.settings,
             samples: this._data.samples,
-            plotType: this._data.plotType
+            plotType: this._data.plotType,
+            extraMetaDataDBID: this._data.extraMetaDataDBID
           }
         })
       }
