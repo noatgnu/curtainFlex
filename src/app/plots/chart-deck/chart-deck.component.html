@@ -1,7 +1,25 @@
 
-
-<ng-container *ngFor="let plot of plotDataArray">
+<ngb-pagination
+  [(page)]="page"
+  [pageSize]="pageSize"
+  [collectionSize]="plotDataArray.length"
+  [maxSize]="5"
+  [rotate]="true"
+  [boundaryLinks]="true"
+>
+</ngb-pagination>
+<ng-container *ngFor="let plot of plotDataArray| slice: (page-1)*pageSize:page*pageSize">
   <ng-container [ngSwitch]="plot.plotType">
     <app-bar-chart *ngSwitchCase="'bar-chart'" [data]="plot"></app-bar-chart>
   </ng-container>
 </ng-container>
+<ngb-pagination
+  [(page)]="page"
+  [pageSize]="pageSize"
+  [collectionSize]="plotDataArray.length"
+  [maxSize]="5"
+  [rotate]="true"
+  [boundaryLinks]="true"
+>
+
+</ngb-pagination>

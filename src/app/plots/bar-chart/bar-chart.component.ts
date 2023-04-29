@@ -48,16 +48,22 @@ export class BarChartComponent {
   samples: any[] = []
 
   extraMetaDataDBID: string = ""
-
+  primaryID: string = ""
+  geneName: string = ""
+  proteinName: string = ""
   @Input() set data(value: PlotDataGeneric) {
     this.samples = value.samples
     this.settings = value.settings
     this.df = value.df
+    this.primaryID = value.df[value.form.primaryID]
     if (value.extraMetaDataDBID) {
       this.extraMetaDataDBID = value.extraMetaDataDBID
-      const data = this.dataService.getExtraMetaData(value.df[value.form.primaryID], this.extraMetaDataDBID)
+      const data = this.dataService.getExtraMetaData(this.primaryID, this.extraMetaDataDBID)
       if (data) {
+
         this.settings.plotTitle = `${data["Gene Names"]}<br>${value.df[value.form.primaryID]}`
+        this.geneName = data["Gene Names"]
+        this.proteinName = data["Protein names"]
       }
     }
     this.drawGraph()

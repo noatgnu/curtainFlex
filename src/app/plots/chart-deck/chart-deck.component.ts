@@ -18,6 +18,11 @@ export class ChartDeckComponent {
   }
   filteredData: IDataFrame = new DataFrame()
   plotDataArray: PlotDataGeneric[] = []
+
+  page: number = 1
+
+  pageSize: number = 5
+
   @Input() set data(value: PlotData) {
     if (value !== this._data) {
       this.plotDataArray = []
@@ -29,23 +34,33 @@ export class ChartDeckComponent {
           this._data.settings.colorMap[this._data.samples[i].condition] = this.dataService.palette.pastel[colorIndex]
         }
       }
-      console.log(value)
+
       if (this._data.df.count() > 0) {
         this.filteredData = this._data.df.where((row: any) => row[this._data.form.primaryID] in value.settings.selectedMap).bake()
         if (this.filteredData.count() === 0) {
-          this.filteredData = this._data.df.head(5).bake()
+          this.filteredData = this._data.df
         }
-        console.log(this.filteredData.toArray())
+
+        const result: any = {
+          df: {},
+          form: this._data.form,
+          settings: this._data.settings,
+          samples: this._data.samples,
+          plotType: this._data.plotType,
+          extraMetaDataDBID: this._data.extraMetaDataDBID
+        }
+
         this.plotDataArray = this.filteredData.toArray().map((row: any) => {
-          return {
-            df: row,
-            form: this._data.form,
-            settings: this._data.settings,
-            samples: this._data.samples,
-            plotType: this._data.plotType,
-            extraMetaDataDBID: this._data.extraMetaDataDBID
+          const res = JSON.parse(JSON.stringify(result))
+          res.df = row
+          if (this._data.extraMetaDataDBID) {
+            const data = this.dataService.getExtraMetaData(row[this._data.form.primaryID], this._data.extraMetaDataDBID)
+            console.log(data)
           }
+
+          return res
         })
+        console.log(this.plotDataArray)
       }
 
     }

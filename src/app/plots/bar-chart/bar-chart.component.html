@@ -1,1 +1,25 @@
-<plotly-plot [data]="graphData" [layout]="graphLayout" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
+<div class="d-flex">
+  <div class="p-2" *ngIf="extraMetaDataDBID && extraMetaDataDBID !== ''" style="width: 400px">
+    <div class="card">
+      <div class="card-body">
+        <p class="card-text">
+          <b>Primary ID</b> {{primaryID}}<br>
+        </p>
+        <p class="card-text">
+          <b>Gene name</b> {{geneName}}<br>
+        </p>
+        <p class="card-text">
+          <b>Protein name</b> {{proteinName}}<br>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="p-2 flex-fill">
+    <div class="card">
+      <div class="card-body">
+        <plotly-plot [data]="graphData" [layout]="graphLayout" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -74,17 +74,22 @@ export class SelectExtraMetadataModalComponent {
           switch (this.form.value["source"]) {
             case "uniprot":
               const accession = new Accession(accSplit[0], true)
-              if (accession.acc) {
+              if (accession.acc !== undefined && accession.acc !== "") {
                 const accList = accMap.get(r[this.form.value["column"]])
                 if (accList) {
-                  accList.push(accession.acc)
+                  accList.push(accession.acc.slice())
                   accMap.set(r[this.form.value["column"]], accList)
                 }
                 accs.push(accession.acc)
+              } else {
+                accs.push(accession.rawAcc)
               }
+              break
+            default:
               break
           }
         }
+
         if (accs.length > 0) {
           switch (this.form.value["source"]) {
             case "uniprot":
