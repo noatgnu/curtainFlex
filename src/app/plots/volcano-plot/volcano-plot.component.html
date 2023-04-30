@@ -1,6 +1,6 @@
 <div class="d-flex">
   <div class="p-2">
-    <plotly-plot [data]="graphData" [layout]="graphLayout" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
+    <plotly-plot (selected)="selectDataPoints($event)" (plotlyClick)="clickDataPoint($event)" [data]="graphData" [layout]="graphLayout" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
   </div>
   <div class="p-2">
     <form [formGroup]="form" style="width: 400px">

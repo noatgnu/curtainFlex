@@ -8,7 +8,9 @@
     <div class="form-group">
       <label for="chartType">Chart Type</label>
       <select class="form-control" id="chartType" formControlName="plotType">
-        <option *ngFor="let ct of plotTypeList" [value]="ct.value">{{ct.name}}</option>
+        <ng-container *ngFor="let ct of plotTypeList">
+          <option  [value]="ct.value" *ngIf="ct.enable">{{ct.name}}</option>
+        </ng-container>
       </select>
     </div>
     <div class="form-group" *ngIf="data.filenameList.length > 0">

@@ -39,12 +39,12 @@ export class ChartSelectionComponent implements AfterViewInit{
 
 
   plotTypeList = [
-    {name: 'Volcano Plot', value: 'volcano-plot'},
-    {name: 'Correlation Matrix', value: 'correlation-matrix'},
-    {name: 'Scatter Plot', value: 'scatter-plot'},
-    {name: 'Bar Chart', value: 'bar-chart'},
-    {name: 'Line Chart', value: 'line-chart'},
-    {name: 'Box Plot', value: 'box-plot'},
+    {name: 'Volcano Plot', value: 'volcano-plot', enable: true},
+    {name: 'Correlation Matrix', value: 'correlation-matrix', enable: false},
+    {name: 'Scatter Plot', value: 'scatter-plot', enable: false},
+    {name: 'Protein Intensity Data (Bar chart and violin plot)', value: 'bar-chart', enable: true},
+    {name: 'Line Chart', value: 'line-chart', enable: false},
+    {name: 'Box Plot', value: 'box-plot', enable: false},
   ]
 
   initialForm = this.fb.group({

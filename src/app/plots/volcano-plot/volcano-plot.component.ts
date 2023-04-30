@@ -146,11 +146,13 @@ export class VolcanoPlotComponent {
           temp[category]["x"].push(fc)
           temp[category]["y"].push(pValue)
           temp[category]["text"].push(dataText)
+          temp[category]["primaryID"].push(primaryID)
         }
       } else if (this.settings.backgroundColorGrey) {
         temp["Background"]["x"].push(fc)
         temp["Background"]["y"].push(pValue)
         temp["Background"]["text"].push(dataText)
+        temp["Background"]["primaryID"].push(primaryID)
       } else {
         const group = this.dataService.significantGroup(fc, pValue, this.settings.pCutOff, this.settings.fcCutOff)
         if (!(group in temp)) {
@@ -165,6 +167,7 @@ export class VolcanoPlotComponent {
             x: [],
             y: [],
             text: [],
+            primaryID: [],
             type: "scattergl",
             mode: "markers",
             name: group,
@@ -177,6 +180,7 @@ export class VolcanoPlotComponent {
         temp[group]["x"].push(fc)
         temp[group]["y"].push(pValue)
         temp[group]["text"].push(dataText)
+        temp[group]["primaryID"].push(primaryID)
       }
     }
     const graphData: any[] = []
@@ -205,6 +209,7 @@ export class VolcanoPlotComponent {
       x:[],
       y:[],
       text: [],
+      primaryID: [],
       type: "scattergl",
       mode: "markers",
       name: "Background",
@@ -243,6 +248,7 @@ export class VolcanoPlotComponent {
         x: [],
         y: [],
         text: [],
+        primaryID: [],
         type: "scattergl",
         mode: "markers",
         name: s,
@@ -307,5 +313,18 @@ export class VolcanoPlotComponent {
 
   markAsDirty() {
     this.form.markAsDirty()
+  }
+
+  clickDataPoint(event: any) {
+    const primaryID = event.points[0].data.primaryID[event.points[0].pointNumber]
+    console.log(primaryID)
+  }
+
+  selectDataPoints(event: any) {
+    const primaryIDs: string[] = []
+    for (const p of event.points) {
+      primaryIDs.push(p.data.primaryID[p.pointNumber])
+    }
+    console.log(primaryIDs)
   }
 }
