@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {Parser} from "uniprotparserjs";
 import {fromCSV} from "data-forge";
+import {Subject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -8,6 +9,8 @@ import {fromCSV} from "data-forge";
 export class UniprotService {
   progressValue = 0
   progressText = ""
+  progressSubject: Subject<{progressValue: number, progressText: string}> = new Subject()
+
   constructor() { }
 
   async getUniprot(accs: string[], accMap: Map<string, string[]>) {
@@ -48,6 +51,7 @@ export class UniprotService {
       }
       this.progressValue = currentRun * 100/totalRun
       this.progressText = `Processed UniProt Job ${currentRun}/${totalRun}`
+      this.progressSubject.next({progressValue: this.progressValue, progressText: this.progressText})
       currentRun ++
     }
     return {db: db, dataMap: dataMap, geneList: geneList}

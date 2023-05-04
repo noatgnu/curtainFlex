@@ -30,7 +30,12 @@ export class DataService {
     loadingProgress: 0,
     loadingProgressMessage: "",
   }
-  constructor(private uniprot: UniprotService, private accountsService: AccountsService) { }
+  constructor(private uniprot: UniprotService, private accountsService: AccountsService) {
+    this.uniprot.progressSubject.asObservable().subscribe(data => {
+      this.currentSession.loadingProgress = data.progressValue
+      this.currentSession.loadingProgressMessage = data.progressText
+    })
+  }
 
   processForm(data: IDataFrame, form: any, plotType: string): {form: any, samples: {sample: string, replicate: string, column: string}[], data: IDataFrame, plotType: string} {
     let samples: {condition: string, replicate: string, column: string}[] = []
@@ -267,6 +272,7 @@ export class DataService {
     sampleVisibility: {},
     categories: [],
     selectedMap: {},
+    barChartErrorType: "Standard Error",
   }
 
   getDefaultsPlotOptions(plotType: string) {

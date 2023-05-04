@@ -18,6 +18,15 @@
     <div class="card">
       <div class="card-body">
         <plotly-plot [data]="graphData" [layout]="graphLayout" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
+        <div class="d-flex">
+          <div class="p-2 flex-fill">
+            <plotly-plot [data]="graphDataAverage" [layout]="graphLayoutAverage" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
+          </div>
+          <div class="p-2 flex-fill">
+            <plotly-plot [data]="graphDataViolin" [layout]="graphLayoutViolin" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
+          </div>
+
+        </div>
       </div>
     </div>
   </div>
