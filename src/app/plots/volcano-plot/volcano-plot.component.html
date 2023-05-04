@@ -53,11 +53,9 @@
         <input type="checkbox" id="backgroundGrey" formControlName="backgroundColorGrey" class="form-check-input">
         <label for="backgroundGrey" class="form-check-label">Grey background datapoint</label>
       </div>
-      <div class="d-flex">
-        <div class="form-group p-2" *ngFor="let col of colorKeys">
-          <label>{{col}}</label>
-          <input [(colorPicker)]="settings.colorMap[col]" class="form-control" [style.background-color]="settings.colorMap[col]" (colorPickerChange)="markAsDirty()">
-        </div>
+      <div class="form-group p-2" *ngFor="let col of colorKeys">
+        <label>{{col}}</label>
+        <input [(colorPicker)]="settings.colorMap[col]" class="form-control" [style.background-color]="settings.colorMap[col]" (colorPickerChange)="markAsDirty()">
       </div>
     </form>
   </div>

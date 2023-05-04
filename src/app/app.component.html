@@ -28,10 +28,10 @@
               </button>
               <div ngbDropdownMenu aria-labelledby="sessionDropdown">
                 <a class="dropdown-item" (click)="fileUpload.click()"><i class="bi-database-add"></i> Import Data File</a>
-                <a class="dropdown-item" (click)="saveToWeb()"> Save Session</a>
-                <a class="dropdown-item" (click)="exportToFile()"> Export Session To File</a>
-                <a class="dropdown-item" (click)="sessionFileUpload.click()"> Load Session From File</a>
-                <a class="dropdown-item"><i class="bi-database"></i> Data Management</a>
+                <a class="dropdown-item" (click)="saveToWeb()"><i class="bi-download"></i> Save Session</a>
+                <a class="dropdown-item" (click)="exportToFile()"><i class="bi-database-down"></i> Export Session To File</a>
+                <a class="dropdown-item" (click)="sessionFileUpload.click()"><i class="bi-database"></i> Load Session From File</a>
+                <a class="dropdown-item"><i class="bi-database-gear"></i> Data Management</a>
               </div>
             </div>
           </li>
@@ -47,21 +47,27 @@
             </div>
           </li>
         </ul>
-        <form class="d-flex" role="search">
+        <!--<form class="d-flex" role="search">
           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-primary" type="submit">Search</button>
-        </form>
+        </form>-->
       </div>
     </div>
   </div>
 </nav>
 
+
 <div class="container" *ngIf="dataService.currentSession.id !== ''">
-  <div class="card bg-info mt-2">
+  <div class="card mt-2">
     <div class="card-body">
       <p class="card-text">
         Session ID: {{dataService.currentSession.id}}<br>
         Session Link: <a href="{{dataService.currentSession.link}}" target="_blank">{{dataService.currentSession.link}}</a>
+      </p>
+      <p>
+        <ngb-progressbar [striped]="true" [animated]="true" type="info" *ngIf="dataService.currentSession.loading" [value]="dataService.currentSession.loadingProgress">
+          {{dataService.currentSession.loadingProgressMessage}}
+        </ngb-progressbar>
       </p>
     </div>
   </div>

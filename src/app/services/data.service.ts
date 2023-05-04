@@ -25,7 +25,10 @@ export class DataService {
   currentSession: any = {
     id: "",
     data: {},
-    link: ""
+    link: "",
+    loading: false,
+    loadingProgress: 0,
+    loadingProgressMessage: "",
   }
   constructor(private uniprot: UniprotService, private accountsService: AccountsService) { }
 
@@ -420,12 +423,16 @@ export class DataService {
   }
 
   async processJSON(jsonData: any) {
+    this.currentSession.loading = true
+    this.currentSession.loadingProgress = 100
+    this.currentSession.loadingProgressMessage = "Loading data..."
     this.plotLists = []
     this.data = {files: new Map<string, InputFile>(), filenameList: jsonData.data.filenameList}
     for (const key in jsonData.data.files) {
       const inputFile = new InputFile(fromCSV(jsonData.data.files[key]["originalFile"]), jsonData.data.files[key].filename, jsonData.data.files[key]["originalFile"])
       this.data.files.set(key, inputFile)
       if (jsonData.extraMetaData[key]) {
+        this.currentSession.loadingProgressMessage = `Processing ${jsonData.data.files[key].filename}...`
         if (!jsonData.extraMetaData[key]["enableLink"]) {
           const {
             accMap,
@@ -436,6 +443,7 @@ export class DataService {
             let meta: any = {}
             switch (jsonData.extraMetaData[key]["source"]) {
               case "uniprot":
+                this.currentSession.loadingProgressMessage = `Getting extra metadata from UniProt for ${key}...`
                 const uniResult = await this.uniprot.getUniprot(accs, accMap)
                 meta = {
                   db: uniResult.db,
@@ -466,6 +474,7 @@ export class DataService {
       }
     }
     for (const plot of jsonData.plotLists) {
+      this.currentSession.loadingProgressMessage = `Processing plot ${plot.id}...`
       const p: PlotData = {
         settings: plot.settings,
         id: plot.id,
@@ -481,6 +490,7 @@ export class DataService {
       p.df = processed.data
       this.searchSubject.set(p.id, new Subject<any>())
       this.addPlotToList(p)
+      this.currentSession.loadingProgressMessage = "Finished"
     }
   }
 
