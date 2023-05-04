@@ -28,6 +28,7 @@
               </button>
               <div ngbDropdownMenu aria-labelledby="sessionDropdown">
                 <a class="dropdown-item" (click)="fileUpload.click()"><i class="bi-database-add"></i> Import Data File</a>
+                <a class="dropdown-item" (click)="saveToWeb()"> Save Session</a>
                 <a class="dropdown-item" (click)="exportToFile()"> Export Session To File</a>
                 <a class="dropdown-item" (click)="sessionFileUpload.click()"> Load Session From File</a>
                 <a class="dropdown-item"><i class="bi-database"></i> Data Management</a>
@@ -54,4 +55,16 @@
     </div>
   </div>
 </nav>
-<app-plot-compositor></app-plot-compositor>
+
+<div class="container" *ngIf="dataService.currentSession.id !== ''">
+  <div class="card bg-info mt-2">
+    <div class="card-body">
+      <p class="card-text">
+        Session ID: {{dataService.currentSession.id}}<br>
+        Session Link: <a href="{{dataService.currentSession.link}}" target="_blank">{{dataService.currentSession.link}}</a>
+      </p>
+    </div>
+  </div>
+</div>
+<router-outlet></router-outlet>
+

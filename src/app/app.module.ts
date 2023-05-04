@@ -24,6 +24,7 @@ import {ColorPickerModule} from "ngx-color-picker";
 import { BatchSearchModalComponent } from './modal/batch-search-modal/batch-search-modal.component';
 import { SelectExtraMetadataModalComponent } from './modal/select-extra-metadata-modal/select-extra-metadata-modal.component';
 import { VolcanoSelectionModalComponent } from './plots/volcano-plot/volcano-selection-modal/volcano-selection-modal.component';
+import { HomeComponent } from './home/home.component';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 @NgModule({
@@ -44,7 +45,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
     ChartDeckComponent,
     BatchSearchModalComponent,
     SelectExtraMetadataModalComponent,
-    VolcanoSelectionModalComponent
+    VolcanoSelectionModalComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,

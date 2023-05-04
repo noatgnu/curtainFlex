@@ -9,6 +9,7 @@ import {
 } from "../modal/select-extra-metadata-modal/select-extra-metadata-modal.component";
 import {UniprotService} from "./uniprot.service";
 import {addWarning} from "@angular-devkit/build-angular/src/utils/webpack-diagnostics";
+import {AccountsService} from "./accounts.service";
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +22,12 @@ export class DataService {
   extraMetaData: Map<string, any> = new Map<string, any>()
   searchSubject: Map<string, Subject<any>> = new Map<string, Subject<any>>()
 
-
-  constructor(private uniprot: UniprotService) { }
+  currentSession: any = {
+    id: "",
+    data: {},
+    link: ""
+  }
+  constructor(private uniprot: UniprotService, private accountsService: AccountsService) { }
 
   processForm(data: IDataFrame, form: any, plotType: string): {form: any, samples: {sample: string, replicate: string, column: string}[], data: IDataFrame, plotType: string} {
     let samples: {condition: string, replicate: string, column: string}[] = []
@@ -339,26 +344,7 @@ export class DataService {
   }
 
   exportData() {
-    const files: any = {}
-    this.data.files.forEach((df, key) => {
-      files[key] = {}
-      files[key]["filename"] = df.filename
-      files[key]["originalFile"] = df.originalFile
-      files[key]["other"] = df.other
-      files[key]["extraMetaDataDBID"] = df.extraMetaDataDBID
-      files[key]["df"] = ""
-    })
-    const extraMetaData: any = {}
-    this.extraMetaData.forEach((value, key) => {
-      if (value["form"]) {
-        extraMetaData[key] = value["form"]
-      }
-    })
-    const tobeExported: any = {
-      data: {files: files, filenameList: this.data.filenameList},
-      plotLists: this.plotLists,
-      extraMetaData: extraMetaData,
-    }
+    const tobeExported = this.getDataPack();
 
     const data = JSON.stringify(tobeExported, (key, value) => {
       if (key === "df" && value instanceof DataFrame) {
@@ -377,6 +363,42 @@ export class DataService {
     window.URL.revokeObjectURL(url)
   }
 
+  getDataPack() {
+    const files: any = {}
+    this.data.files.forEach((df, key) => {
+      files[key] = {}
+      files[key]["filename"] = df.filename
+      files[key]["originalFile"] = df.originalFile
+      files[key]["other"] = df.other
+      files[key]["extraMetaDataDBID"] = df.extraMetaDataDBID
+      files[key]["df"] = ""
+    })
+    const extraMetaData: any = {}
+    this.extraMetaData.forEach((value, key) => {
+      if (value["form"]) {
+        extraMetaData[key] = value["form"]
+      }
+    })
+    const tobeExported: any = {
+      data: {files: files, filenameList: this.data.filenameList},
+      plotLists: this.plotLists.map((plot) => {
+        return {
+          df: "",
+          extraMetaDataDBID: plot.extraMetaDataDBID,
+          filename: plot.filename,
+          form: plot.form,
+          id: plot.id,
+          plotType: plot.plotType,
+          samples: plot.samples,
+          searchLinkTo: plot.searchLinkTo,
+          settings: plot.settings
+        }
+      }),
+      extraMetaData: extraMetaData,
+    }
+    return tobeExported;
+  }
+
   loadSessionFromFile(file: File) {
     const reader = new FileReader()
     reader.onprogress = (event) => {
@@ -393,67 +415,88 @@ export class DataService {
   private async processFile(result: string | ArrayBuffer | null) {
     if (result) {
       const jsonData = JSON.parse(result as string)
-      this.data = {files: new Map<string, InputFile>(), filenameList: jsonData.data.filenameList}
-      for (const key in jsonData.data.files) {
-        const inputFile = new InputFile(fromCSV(jsonData.data.files[key]["originalFile"]), jsonData.data.files[key].filename, jsonData.data.files[key]["originalFile"])
-        this.data.files.set(key, inputFile)
-        if (jsonData.extraMetaData[key]) {
-          if (!jsonData.extraMetaData[key]["enableLink"]) {
-            const {
-              accMap,
-              primaryIDMap,
-              accs
-            } = SelectExtraMetadataModalComponent.getAccs(jsonData.extraMetaData[key], inputFile.df)
-            if (accs.length > 0) {
-              let meta: any = {}
-              switch (jsonData.extraMetaData[key]["source"]) {
-                case "uniprot":
-                  const uniResult = await this.uniprot.getUniprot(accs, accMap)
-                  meta = {
-                    db: uniResult.db,
-                    dataMap: uniResult.dataMap,
-                    form: jsonData.extraMetaData[key],
-                    accMap: accMap,
-                    primaryIDMap: primaryIDMap,
-                    geneList: uniResult.geneList
-                  }
+      await this.processJSON(jsonData);
+    }
+  }
 
-                  break
-              }
-              if (Object.keys(meta).length > 0) {
-                if (meta.form.enableLink) {
-                  if (meta.form.linkTo) {
-                    const df2 = this.data.files.get(meta.form.linkTo)
-                    if (df2) {
-                      inputFile.extraMetaDataDBID = df2.extraMetaDataDBID
-                    }
-                  }
-                } else {
-                  inputFile.extraMetaDataDBID = key
-                  this.extraMetaData.set(inputFile.extraMetaDataDBID, meta)
+  async processJSON(jsonData: any) {
+    this.plotLists = []
+    this.data = {files: new Map<string, InputFile>(), filenameList: jsonData.data.filenameList}
+    for (const key in jsonData.data.files) {
+      const inputFile = new InputFile(fromCSV(jsonData.data.files[key]["originalFile"]), jsonData.data.files[key].filename, jsonData.data.files[key]["originalFile"])
+      this.data.files.set(key, inputFile)
+      if (jsonData.extraMetaData[key]) {
+        if (!jsonData.extraMetaData[key]["enableLink"]) {
+          const {
+            accMap,
+            primaryIDMap,
+            accs
+          } = SelectExtraMetadataModalComponent.getAccs(jsonData.extraMetaData[key], inputFile.df)
+          if (accs.length > 0) {
+            let meta: any = {}
+            switch (jsonData.extraMetaData[key]["source"]) {
+              case "uniprot":
+                const uniResult = await this.uniprot.getUniprot(accs, accMap)
+                meta = {
+                  db: uniResult.db,
+                  dataMap: uniResult.dataMap,
+                  form: jsonData.extraMetaData[key],
+                  accMap: accMap,
+                  primaryIDMap: primaryIDMap,
+                  geneList: uniResult.geneList
                 }
+
+                break
+            }
+            if (Object.keys(meta).length > 0) {
+              if (meta.form.enableLink) {
+                if (meta.form.linkTo) {
+                  const df2 = this.data.files.get(meta.form.linkTo)
+                  if (df2) {
+                    inputFile.extraMetaDataDBID = df2.extraMetaDataDBID
+                  }
+                }
+              } else {
+                inputFile.extraMetaDataDBID = key
+                this.extraMetaData.set(inputFile.extraMetaDataDBID, meta)
               }
             }
           }
         }
       }
-      for (const plot of jsonData.plotLists) {
-        const p: PlotData = {
-          settings: plot.settings,
-          id: plot.id,
-          filename: plot.filename,
-          df: fromCSV(jsonData.data.files[plot.filename]["originalFile"]),
-          form: plot.form,
-          samples: plot.samples,
-          plotType: plot.plotType,
-          searchLinkTo: plot.searchLinkTo,
-          extraMetaDataDBID: plot.extraMetaDataDBID
-        }
-        const processed = this.processForm(p.df, p.form, p.plotType)
-        p.df = processed.data
-        this.searchSubject.set(p.id, new Subject<any>())
-        this.addPlotToList(p)
+    }
+    for (const plot of jsonData.plotLists) {
+      const p: PlotData = {
+        settings: plot.settings,
+        id: plot.id,
+        filename: plot.filename,
+        df: fromCSV(jsonData.data.files[plot.filename]["originalFile"]),
+        form: plot.form,
+        samples: plot.samples,
+        plotType: plot.plotType,
+        searchLinkTo: plot.searchLinkTo,
+        extraMetaDataDBID: plot.extraMetaDataDBID
       }
+      const processed = this.processForm(p.df, p.form, p.plotType)
+      p.df = processed.data
+      this.searchSubject.set(p.id, new Subject<any>())
+      this.addPlotToList(p)
     }
   }
+
+  saveSessionToWeb() {
+    const tobeExported = this.getDataPack();
+
+    this.accountsService.curtainAPI.putSettings(tobeExported, !this.accountsService.curtainAPI.user.loginStatus, "").then((res) => {
+      if (res.data) {
+        this.currentSession.id = res.data.link_id
+        this.currentSession.data = res.data
+        this.currentSession.link = location.origin + "/#/" + this.currentSession.id
+
+      }
+    }).catch((err) => {
+      console.log(err)
+    })
+  }
+
 }

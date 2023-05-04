@@ -10,6 +10,7 @@ import {
 } from "./modal/select-extra-metadata-modal/select-extra-metadata-modal.component";
 import {UniprotService} from "./services/uniprot.service";
 import {Subject} from "rxjs";
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'app-root',
@@ -21,7 +22,11 @@ export class AppComponent implements OnInit{
   settings: any = {files: {}}
 
 
-  constructor(private modal: NgbModal, public dataService: DataService) { }
+  constructor(private modal: NgbModal, public dataService: DataService, private route: ActivatedRoute) {
+    this.route.params.subscribe(params => {
+      console.log(params)
+    })
+  }
 
   ngOnInit(): void {
 
@@ -108,5 +113,9 @@ export class AppComponent implements OnInit{
         this.dataService.loadSessionFromFile(target.files[0])
       }
     }
+  }
+
+  saveToWeb() {
+    this.dataService.saveSessionToWeb()
   }
 }

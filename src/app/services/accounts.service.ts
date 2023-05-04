@@ -7,5 +7,8 @@ import {environment} from "../../environments/environment";
 })
 export class AccountsService {
   curtainAPI: CurtainWebAPI = new CurtainWebAPI(environment.apiURL)
-  constructor() { }
+  isOwner: boolean = false
+  constructor() {
+  }
+
 }
