@@ -1,17 +1,20 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, Output} from '@angular/core';
 import {DataFrame, IDataFrame} from "data-forge";
 import {DataService} from "../../services/data.service";
 import {PlotData} from "../../interface/plot-data";
 import {FormBuilder} from "@angular/forms";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {VolcanoSelectionModalComponent} from "./volcano-selection-modal/volcano-selection-modal.component";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-volcano-plot',
   templateUrl: './volcano-plot.component.html',
   styleUrls: ['./volcano-plot.component.less']
 })
-export class VolcanoPlotComponent {
+export class VolcanoPlotComponent implements OnDestroy{
   @Output() formChanged: EventEmitter<boolean> = new EventEmitter<boolean>()
-
+  @Output() settingsChanged: EventEmitter<any> = new EventEmitter<any>()
   graphData: any[] = []
   graphLayout: any = {
     height: 700, width: 700, xaxis: {title: "Log2FC"},
@@ -49,21 +52,48 @@ export class VolcanoPlotComponent {
 
   df: IDataFrame = new DataFrame()
   extraMetaDataDBID: string = ""
+  plotId = ""
+
   @Input() set data(value: PlotData) {
+    this.plotId = value.id
     this.fcColumn = value.form.foldChange
     this.pValueColumn = value.form.minuslog10pValue
     this.primaryIDColumn = value.form.primaryID
     this.settings = value.settings
     if (value.extraMetaDataDBID) {
       this.extraMetaDataDBID = value.extraMetaDataDBID
-      console.log(this.extraMetaDataDBID)
-      console.log(this.dataService.extraMetaData.get(this.extraMetaDataDBID))
     }
     this.form.controls['plotTitle'].setValue(this.settings.plotTitle)
     this.form.controls['pCutOff'].setValue(this.settings.pCutOff)
     this.form.controls['fcCutOff'].setValue(this.settings.fcCutOff)
     this.form.controls['backgroundColorGrey'].setValue(this.settings.backgroundColorGrey)
     this.df = value.df
+    if (this.subscription) {
+      this.subscription.unsubscribe()
+    }
+    this.subscription = this.dataService.searchSubject.get(this.plotId)?.asObservable().subscribe((value) => {
+      if (value) {
+        if (value.title === "") {
+          for (const primaryId of value.primaryIds) {
+            this.addDataToSelection(primaryId)
+          }
+        } else {
+          if (!this.settings.categories.includes(value.title)) {
+            this.settings.categories.push(value.title)
+          }
+          for (const d of value.primaryIds) {
+            if (!this.settings.selectedMap[d]) {
+              this.settings.selectedMap[d] = []
+            }
+            if (!this.settings.selectedMap[d].includes(value.title)) {
+              this.settings.selectedMap[d].push(value.title)
+            }
+          }
+        }
+        this.drawGraph()
+      }
+    })
+
     this.drawGraph()
   }
 
@@ -80,10 +110,14 @@ export class VolcanoPlotComponent {
     pointSize: [10,]
   })
 
-  constructor(private dataService: DataService, private fb: FormBuilder) {
+  subscription: Subscription|undefined
+
+  constructor(private dataService: DataService, private fb: FormBuilder, private modal: NgbModal) {
     this.form.valueChanges.subscribe(() => {
       this.formChanged.emit(this.form.dirty)
     })
+
+
   }
 
   breakColor: boolean = false
@@ -113,7 +147,7 @@ export class VolcanoPlotComponent {
     this.layoutMaxMin.xMax =this.df.getSeries(this.fcColumn).where(i => !isNaN(i)).max()
     this.layoutMaxMin.yMin = this.df.getSeries(this.pValueColumn).where(i => !isNaN(i)).min()
     this.layoutMaxMin.yMax = this.df.getSeries(this.pValueColumn).where(i => !isNaN(i)).max()
-    console.log(this.layoutMaxMin)
+
     this.graphLayout.xaxis.range = [this.layoutMaxMin.xMin - 0.5, this.layoutMaxMin.xMax + 0.5]
     if (this.settings.manualAxis && this.settings.volcanoAxis.minX) {
       this.graphLayout.xaxis.range[0] = this.settings.volcanoAxis.minX
@@ -140,7 +174,6 @@ export class VolcanoPlotComponent {
           dataText = `${extra["Gene Names"]}<br>${primaryID}`
         }
       }
-      console.log(this.settings)
       if (primaryID in this.settings.selectedMap) {
         for (const category of this.settings.selectedMap[primaryID]) {
           temp[category]["x"].push(fc)
@@ -194,8 +227,9 @@ export class VolcanoPlotComponent {
 
     this.graphData = graphData.reverse()
     this.colorKeys = Object.keys(this.settings.colorMap)
-    console.log(this.graphData)
+
     this.form.markAsPristine()
+    this.settingsChanged.emit(this.settings)
   }
 
   prepareCategories() {
@@ -317,14 +351,70 @@ export class VolcanoPlotComponent {
 
   clickDataPoint(event: any) {
     const primaryID = event.points[0].data.primaryID[event.points[0].pointNumber]
-    console.log(primaryID)
+    this.addDataToSelection(primaryID)
+    this.drawGraph()
   }
 
   selectDataPoints(event: any) {
-    const primaryIDs: string[] = []
+    const data: any[] = []
     for (const p of event.points) {
-      primaryIDs.push(p.data.primaryID[p.pointNumber])
+      const primaryID = p.data.primaryID[p.pointNumber]
+      const extra = this.dataService.getExtraMetaData(primaryID, this.extraMetaDataDBID)
+      const entry: any = {
+        primaryID: primaryID,
+        x: p.x,
+        y: p.y,
+      }
+      if (extra) {
+        entry["geneName"] = extra["Gene Names"]
+      }
+      data.push(entry)
     }
-    console.log(primaryIDs)
+    if (data.length > 0) {
+      const ref = this.modal.open(VolcanoSelectionModalComponent, {size: "lg"})
+      ref.componentInstance.data = data
+      ref.closed.subscribe((result) => {
+        if (result.title !== "") {
+          if (!this.settings.categories.includes(result.title)) {
+            this.settings.categories.push(result.title)
+          }
+          for (const d of data) {
+            if (!this.settings.selectedMap[d.primaryID]) {
+              this.settings.selectedMap[d.primaryID] = []
+            }
+            if (!this.settings.selectedMap[d.primaryID].includes(result.title)) {
+              this.settings.selectedMap[d.primaryID].push(result.title)
+            }
+          }
+        } else {
+          for (const d of data) {
+            this.addDataToSelection(d.primaryID)
+          }
+        }
+
+        this.drawGraph()
+      })
+
+    }
+  }
+
+  addDataToSelection(primaryID: string) {
+    const extra = this.dataService.getExtraMetaData(primaryID, this.extraMetaDataDBID)
+    if (extra) {
+      const category = `${extra["Gene Names"]} (${primaryID})`
+      if (!this.settings.categories.includes(category)) {
+        this.settings.categories.push(category)
+        if (!this.settings.selectedMap[primaryID]) {
+          this.settings.selectedMap[primaryID] = []
+        }
+        if (!this.settings.selectedMap[primaryID].includes(category)) {
+          this.settings.selectedMap[primaryID].push(category)
+        }
+      }
+    }
+  }
+
+  ngOnDestroy() {
+    this.subscription?.unsubscribe()
   }
 }

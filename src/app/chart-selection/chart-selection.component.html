@@ -6,6 +6,10 @@
 <div class="modal-body">
   <form [formGroup]="initialForm">
     <div class="form-group">
+      <label for="plotTitle">Plot unique title</label>
+      <input formControlName="plotTitle" type="text" class="form-control" id="plotTitle" placeholder="Plot Title">
+    </div>
+    <div class="form-group">
       <label for="chartType">Chart Type</label>
       <select class="form-control" id="chartType" formControlName="plotType">
         <ng-container *ngFor="let ct of plotTypeList">
@@ -17,6 +21,14 @@
       <label for="selectedFile">Select Imported File</label>
       <select class="form-control" id="selectedFile" formControlName="filename">
         <option *ngFor="let filename of data.filenameList" [value]="filename">{{filename}}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="linkSearch">Link search with</label>
+      <select id="linkSearch" class="form-control" formControlName="searchLinkTo">
+        <ng-container *ngFor="let p of plotList">
+          <option [value]="p.id">{{p.id}}</option>
+        </ng-container>
       </select>
     </div>
   </form>

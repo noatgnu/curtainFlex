@@ -5,10 +5,10 @@ import {PlotDataGeneric} from "../../interface/plot-data";
 
 @Component({
   selector: 'app-bar-chart',
-  templateUrl: './bar-chart.component.html',
-  styleUrls: ['./bar-chart.component.less']
+  templateUrl: './protein-summary-chart.component.html',
+  styleUrls: ['./protein-summary-chart.component.less']
 })
-export class BarChartComponent {
+export class ProteinSummaryChartComponent {
   graphData: any[] = []
   graphLayout: any = {
     xaxis: {

@@ -9,6 +9,7 @@ import {ScatterPlotFormComponent} from "./scatter-plot-form/scatter-plot-form.co
 import {BarChartFormComponent} from "./bar-chart-form/bar-chart-form.component";
 import {LineChartFormComponent} from "./line-chart-form/line-chart-form.component";
 import {BoxPlotFormComponent} from "./box-plot-form/box-plot-form.component";
+import {PlotData} from "../interface/plot-data";
 
 @Component({
   selector: 'app-cha rt-selection',
@@ -37,6 +38,15 @@ export class ChartSelectionComponent implements AfterViewInit{
     return this._data
   }
 
+  _plotList: PlotData[] = []
+
+  @Input() set plotList(value: PlotData[]) {
+    this._plotList = value
+  }
+
+  get plotList(): PlotData[] {
+    return this._plotList
+  }
 
   plotTypeList = [
     {name: 'Volcano Plot', value: 'volcano-plot', enable: true},
@@ -48,8 +58,10 @@ export class ChartSelectionComponent implements AfterViewInit{
   ]
 
   initialForm = this.fb.group({
+    plotTitle: [crypto.randomUUID()],
     plotType: ['volcano-plot'],
     filename: [''],
+    searchLinkTo: [''],
   })
 
 
@@ -120,7 +132,7 @@ export class ChartSelectionComponent implements AfterViewInit{
 
   submit() {
     if (this.data.files.get(this.selectedFile)) {
-      this.activeModal.close({data: this.data.files.get(this.selectedFile), form: this.form, plotType: this.selectedPlotType})
+      this.activeModal.close({data: this.data.files.get(this.selectedFile), form: this.form, filename: this.selectedFile, plotType: this.selectedPlotType, plotTitle: this.initialForm.value['plotTitle'], searchLinkTo: this.initialForm.value['searchLinkTo']})
     }
   }
 }

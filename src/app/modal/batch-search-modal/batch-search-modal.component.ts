@@ -12,7 +12,7 @@ export class BatchSearchModalComponent {
   form = this.fb.group({
     title: ['',],
     terms: ['',],
-    searchType: ['',],
+    searchType: ['gene-names',],
   })
 
   filterList: any[] = []

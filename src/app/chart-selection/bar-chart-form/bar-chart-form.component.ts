@@ -1,5 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {FormBuilder} from "@angular/forms";
+import {DataService} from "../../services/data.service";
 
 @Component({
   selector: 'app-bar-chart-form',
@@ -20,5 +21,5 @@ export class BarChartFormComponent {
     samples: [[]],
   })
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder, public dataService: DataService) { }
 }

@@ -1,4 +1,5 @@
-<input type="file" id="fileimport" hidden (change)="handleFile($event)" #fileUpload />
+<input type="file" id="fileimport" hidden (change)="handleFile($event)" #fileUpload accept=".txt"/>
+<input type="file" id="sessionFileImport" hidden (change)="handleSessionFile($event)" #sessionFileUpload accept=".json" />
 <nav class="navbar navbar-expand-lg bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Curtain Flex</a>
@@ -13,8 +14,9 @@
               <button class="btn btn-outline-primary" id="plotDropdown" ngbDropdownToggle>
                 <span><i class="bi-graph-up"></i> Plot</span>
               </button>
-              <div ngbDropdownMenu aria-labelledby="sessionDropdown">
+              <div ngbDropdownMenu aria-labelledby="plotDropdown">
                 <a class="dropdown-item" (click)="openChartSelection()"><i class="bi-graph-up-arrow"></i> Add Plot</a>
+                <a class="dropdown-item"><i class="bi-graph-down-arrow"></i> Remove Plot</a>
                 <a class="dropdown-item"><i class="bi-file-bar-graph-fill"></i> Plot Management</a>
               </div>
             </div>
@@ -26,6 +28,8 @@
               </button>
               <div ngbDropdownMenu aria-labelledby="sessionDropdown">
                 <a class="dropdown-item" (click)="fileUpload.click()"><i class="bi-database-add"></i> Import Data File</a>
+                <a class="dropdown-item" (click)="exportToFile()"> Export Session To File</a>
+                <a class="dropdown-item" (click)="sessionFileUpload.click()"> Load Session From File</a>
                 <a class="dropdown-item"><i class="bi-database"></i> Data Management</a>
               </div>
             </div>

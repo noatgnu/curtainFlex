@@ -18,11 +18,12 @@ import { LineChartFormComponent } from './chart-selection/line-chart-form/line-c
 import { BoxPlotFormComponent } from './chart-selection/box-plot-form/box-plot-form.component';
 import { PlotContainerComponent } from './plots/plot-container/plot-container.component';
 import { PlotCompositorComponent } from './plots/plot-compositor/plot-compositor.component';
-import { BarChartComponent } from './plots/bar-chart/bar-chart.component';
+import { ProteinSummaryChartComponent } from './plots/protein-summary-chart/protein-summary-chart.component';
 import { ChartDeckComponent } from './plots/chart-deck/chart-deck.component';
 import {ColorPickerModule} from "ngx-color-picker";
 import { BatchSearchModalComponent } from './modal/batch-search-modal/batch-search-modal.component';
 import { SelectExtraMetadataModalComponent } from './modal/select-extra-metadata-modal/select-extra-metadata-modal.component';
+import { VolcanoSelectionModalComponent } from './plots/volcano-plot/volcano-selection-modal/volcano-selection-modal.component';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 @NgModule({
@@ -39,10 +40,11 @@ PlotlyModule.plotlyjs = PlotlyJS;
     BoxPlotFormComponent,
     PlotContainerComponent,
     PlotCompositorComponent,
-    BarChartComponent,
+    ProteinSummaryChartComponent,
     ChartDeckComponent,
     BatchSearchModalComponent,
-    SelectExtraMetadataModalComponent
+    SelectExtraMetadataModalComponent,
+    VolcanoSelectionModalComponent
   ],
   imports: [
     BrowserModule,

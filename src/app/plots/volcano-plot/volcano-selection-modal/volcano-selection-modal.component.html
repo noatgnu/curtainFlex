@@ -1,0 +1,75 @@
+<div class="modal-header">
+  <div class="modal-title">
+    Selection Title
+  </div>
+</div>
+<div class="modal-body">
+  <form [formGroup]="form">
+    <div class="form-group">
+      <label for="title">Selection title</label>
+      <input type="text" class="form-control" formControlName="title" id="title" placeholder="Selection">
+    </div>
+  </form>
+  <ng-container *ngIf="data.length > 0">
+    <ngb-pagination
+      [collectionSize]="data.length"
+      [(page)]="page"
+      [pageSize]="5"
+      [maxSize]="5"
+      [rotate]="true"
+      [boundaryLinks]="true"
+    >
+    </ngb-pagination>
+    <table class="table table-striped p-2">
+      <thead>
+      <tr>
+        <th scope="col">
+          Primary ID
+        </th>
+        <th scope="col">
+          Log2 Fold Change
+        </th>
+        <th scope="col">
+          -Log10 P-value
+        </th>
+        <th>
+          Gene name
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <ng-container *ngFor="let item of data | slice: (page-1)*pageSize:page*pageSize">
+        <tr>
+          <td>
+            {{item['primaryID']}}
+          </td>
+          <td>
+            {{item['x']}}
+          </td>
+          <td>
+            {{item['y']}}
+          </td>
+          <td>
+            {{item['geneName']}}
+          </td>
+        </tr>
+      </ng-container>
+      </tbody>
+    </table>
+    <ngb-pagination
+      [collectionSize]="data.length"
+      [(page)]="page"
+      [pageSize]="5"
+      [maxSize]="5"
+      [rotate]="true"
+      [boundaryLinks]="true"
+    >
+    </ngb-pagination>
+  </ng-container>
+
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" (click)="close()">Close</button>
+  <button type="button" class="btn btn-primary" (click)="submit()">Save</button>
+</div>

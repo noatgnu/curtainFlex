@@ -3,6 +3,7 @@ import {FormBuilder} from "@angular/forms";
 import {DataFrame, fromCSV, IDataFrame} from "data-forge";
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {Parser, Accession} from "uniprotparserjs";
+import {UniprotService} from "../../services/uniprot.service";
 
 @Component({
   selector: 'app-select-extra-metadata-modal',
@@ -11,8 +12,7 @@ import {Parser, Accession} from "uniprotparserjs";
 })
 export class SelectExtraMetadataModalComponent {
   private _data: IDataFrame = new DataFrame()
-  progressValue = 0
-  progressText = ""
+
 
   @Input() set data(value: IDataFrame) {
     this._data = value
@@ -40,7 +40,9 @@ export class SelectExtraMetadataModalComponent {
     linkTo: ["",],
     enableLink: [false,],
   })
-  constructor(private fb: FormBuilder, private modal: NgbActiveModal) {
+  constructor(private fb: FormBuilder, private modal: NgbActiveModal, public uniprot: UniprotService) {
+    this.uniprot.progressText = ""
+    this.uniprot.progressValue = 0
   }
 
   skip() {
@@ -49,52 +51,14 @@ export class SelectExtraMetadataModalComponent {
 
   submit() {
     if (!this.form.value["enableLink"]) {
-      if (this.form.value["column"] && this.form.value["primaryID"]) {
-        const accMap = new Map<string, string[]>()
-        const primaryIDMap = new Map<string, string[]>()
-        const accs: string[] = []
-        for (const r of this.data) {
-          primaryIDMap.set(r[this.form.value["primaryID"]], r[this.form.value["column"]])
-          const accSplit = r[this.form.value["column"]].split(";")
-          accMap.set(r[this.form.value["column"]], [r[this.form.value["column"]]])
-          for (const acc of accSplit) {
-            if (!accMap.has(acc)) {
-              accMap.set(acc, [r[this.form.value["column"]]])
-            } else {
-              const accList = accMap.get(acc)
-              if (accList) {
-                const checkIfExist = accList.find(value => value === acc)
-                if (checkIfExist === undefined) {
-                  accList.push(r[this.form.value["column"]])
-                  accMap.set(acc, accList)
-                }
-              }
-            }
-          }
-          switch (this.form.value["source"]) {
-            case "uniprot":
-              const accession = new Accession(accSplit[0], true)
-              if (accession.acc !== undefined && accession.acc !== "") {
-                const accList = accMap.get(r[this.form.value["column"]])
-                if (accList) {
-                  accList.push(accession.acc.slice())
-                  accMap.set(r[this.form.value["column"]], accList)
-                }
-                accs.push(accession.acc)
-              } else {
-                accs.push(accession.rawAcc)
-              }
-              break
-            default:
-              break
-          }
-        }
+      if (this.form.value["column"] && this.form.value["primaryID"] && this.form.value["source"]) {
+        const {accMap, primaryIDMap, accs} = SelectExtraMetadataModalComponent.getAccs(this.form.value, this.data);
 
         if (accs.length > 0) {
           switch (this.form.value["source"]) {
             case "uniprot":
-              this.getUniprot(accs, accMap).then((result) => {
-                this.modal.close({db: result.db, dataMap: result.dataMap, form: this.form.value, accMap: accMap, primaryIDMap: primaryIDMap})
+              this.uniprot.getUniprot(accs, accMap).then((result) => {
+                this.modal.close({db: result.db, dataMap: result.dataMap, form: this.form.value, accMap: accMap, primaryIDMap: primaryIDMap, geneList: result.geneList})
               })
               break
           }
@@ -107,44 +71,51 @@ export class SelectExtraMetadataModalComponent {
   }
 
 
-  async getUniprot(accs: string[], accMap: Map<string, string[]>) {
-    let currentRun = 1
-    let totalRun = Math.ceil(accs.length/500)
-    const parser = new Parser(5, "accession,id,gene_names,protein_name,organism_name,organism_id,length,xref_refseq,ft_var_seq,cc_alternative_products")
-    const res = await parser.parse((accs))
-    const dataMap: Map<string, string> = new Map<string, string>()
-    const db: Map<string, any> = new Map<string, any>()
-    this.progressValue = 100
-    this.progressText = "Started Processing UniProt Data"
-    for await (const result of res) {
-      totalRun = Math.ceil(result.total/500)
-      // @ts-ignore
-      const df = fromCSV(result.data, {delimiter: "\t"})
-      for (const r of df) {
-        if (r["Gene Names"]) {
-          r["Gene Names"] = r["Gene Names"].replaceAll(" ", ";").toUpperCase()
-        }
-
-        db.set(r["Entry"], r)
-        dataMap.set(r["From"], r["Entry"])
-
-        dataMap.set(r["Entry"], r["Entry"])
-        if (accMap.has(r["Entry"])) {
-          const a = accMap.get(r["Entry"])
-          if (a) {
-            for (const query of a) {
-              const que = query.replace(",", ";")
-              for (const q of que.split(";")) {
-                dataMap.set(q, r["Entry"])
-              }
+  static getAccs(form: any, data: IDataFrame): {accMap: Map<string, string[]>, primaryIDMap: Map<string, string[]>, accs: string[]} {
+    const accMap = new Map<string, string[]>()
+    const primaryIDMap = new Map<string, string[]>()
+    const accs: string[] = []
+    for (const r of data) {
+      primaryIDMap.set(r[form["primaryID"]], r[form["column"]])
+      primaryIDMap.set(r[form["column"]], r[form["primaryID"]])
+      const accSplit = r[form["column"]].split(";")
+      accMap.set(r[form["column"]], [r[form["column"]]])
+      for (const acc of accSplit) {
+        if (!accMap.has(acc)) {
+          accMap.set(acc, [r[form["column"]]])
+        } else {
+          const accList = accMap.get(acc)
+          if (accList) {
+            const checkIfExist = accList.includes(acc)
+            if (!checkIfExist) {
+              accList.push(r[form["column"]])
+              accMap.set(acc, accList)
             }
           }
         }
       }
-      this.progressValue = currentRun * 100/totalRun
-      this.progressText = `Processed UniProt Job ${currentRun}/${totalRun}`
-      currentRun ++
+      switch (form["source"]) {
+        case "uniprot":
+          const accession = new Accession(accSplit[0], true)
+          if (accession.acc !== undefined && accession.acc !== "") {
+            const accList = accMap.get(r[form["column"]])
+            if (accList) {
+              if (!accList.includes(accession.acc)) {
+                accList.push(accession.acc.slice())
+                accMap.set(r[form["column"]], accList)
+              }
+            }
+            accs.push(accession.acc)
+          } else {
+            accs.push(accession.rawAcc)
+          }
+          break
+        default:
+          break
+      }
     }
-    return {db: db, dataMap: dataMap}
+    return {accMap, primaryIDMap, accs};
   }
+
+
 }
