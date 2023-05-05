@@ -25,6 +25,11 @@ import { BatchSearchModalComponent } from './modal/batch-search-modal/batch-sear
 import { SelectExtraMetadataModalComponent } from './modal/select-extra-metadata-modal/select-extra-metadata-modal.component';
 import { VolcanoSelectionModalComponent } from './plots/volcano-plot/volcano-selection-modal/volcano-selection-modal.component';
 import { HomeComponent } from './home/home.component';
+import { PlotSettingsModalComponent } from './modal/plot-settings-modal/plot-settings-modal.component';
+import { PdbViewerModalComponent } from './modal/pdb-viewer-modal/pdb-viewer-modal.component';
+import {HttpClientModule} from "@angular/common/http";
+import { ProteinDomainComponent } from './plots/protein-domain/protein-domain.component';
+import { ProteinDomainModalComponent } from './modal/protein-domain-modal/protein-domain-modal.component';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 @NgModule({
@@ -46,7 +51,11 @@ PlotlyModule.plotlyjs = PlotlyJS;
     BatchSearchModalComponent,
     SelectExtraMetadataModalComponent,
     VolcanoSelectionModalComponent,
-    HomeComponent
+    HomeComponent,
+    PlotSettingsModalComponent,
+    PdbViewerModalComponent,
+    ProteinDomainComponent,
+    ProteinDomainModalComponent
   ],
   imports: [
     BrowserModule,
@@ -55,7 +64,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
     PlotlyModule,
     FormsModule,
     ReactiveFormsModule,
-    ColorPickerModule
+    ColorPickerModule,
+    HttpClientModule
   ],
   providers: [
     NgbActiveModal

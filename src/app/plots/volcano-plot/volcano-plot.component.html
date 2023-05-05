@@ -1,6 +1,19 @@
 <div class="d-flex">
   <div class="p-2">
-    <plotly-plot (selected)="selectDataPoints($event)" (plotlyClick)="clickDataPoint($event)" [data]="graphData" [layout]="graphLayout" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
+    <plotly-plot [config]="config" (selected)="selectDataPoints($event)" (plotlyClick)="clickDataPoint($event)" [data]="graphData" [layout]="graphLayout" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
+  </div>
+  <div class="p-2">
+    <h5>Volcano plot colors</h5>
+    <form [formGroup]="form">
+      <div class="form-check">
+        <input type="checkbox" id="backgroundGrey" formControlName="backgroundColorGrey" class="form-check-input">
+        <label for="backgroundGrey" class="form-check-label">Grey background datapoint</label>
+      </div>
+      <div class="form-group p-2" *ngFor="let col of colorKeys">
+        <label>{{col}}</label>
+        <input [(colorPicker)]="settings.colorMap[col]" class="form-control" [style.background-color]="settings.colorMap[col]" (colorPickerChange)="markAsDirty()">
+      </div>
+    </form>
   </div>
   <div class="p-2">
     <form [formGroup]="form" style="width: 400px">
@@ -46,19 +59,7 @@
       </div>
     </form>
   </div>
-  <div class="p-2">
-    <h5>Volcano plot colors</h5>
-    <form [formGroup]="form">
-      <div class="form-check">
-        <input type="checkbox" id="backgroundGrey" formControlName="backgroundColorGrey" class="form-check-input">
-        <label for="backgroundGrey" class="form-check-label">Grey background datapoint</label>
-      </div>
-      <div class="form-group p-2" *ngFor="let col of colorKeys">
-        <label>{{col}}</label>
-        <input [(colorPicker)]="settings.colorMap[col]" class="form-control" [style.background-color]="settings.colorMap[col]" (colorPickerChange)="markAsDirty()">
-      </div>
-    </form>
-  </div>
+
 </div>
 <div class="d-flex flex-row-reverse" *ngIf="form.dirty">
   <button class="btn btn-warning" (click)="drawGraph()">Update</button>

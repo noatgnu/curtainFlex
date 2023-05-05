@@ -11,6 +11,13 @@
           </span>
           </button>
         </div>
+        <div class="p-2">
+          <button class="btn btn-outline-info" [ngbTooltip]="'Settings'" (click)="openSettingsModal()">
+            <span>
+              <i class="bi-gear"></i>
+            </span>
+          </button>
+        </div>
         <form class="d-flex p-2" role="search" [formGroup]="form" (submit)="searchData()">
           <input formControlName="term" class="form-control me-2" type="search" placeholder="Protein of interests" aria-label="Search" [ngbTypeahead]="search">
           <select formControlName="searchType" class="form-control me-2">

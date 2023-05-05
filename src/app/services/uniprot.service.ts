@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {Parser} from "uniprotparserjs";
 import {fromCSV} from "data-forge";
 import {Subject} from "rxjs";
+import {HttpClient} from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root'
@@ -11,12 +12,12 @@ export class UniprotService {
   progressText = ""
   progressSubject: Subject<{progressValue: number, progressText: string}> = new Subject()
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
   async getUniprot(accs: string[], accMap: Map<string, string[]>) {
     let currentRun = 1
     let totalRun = Math.ceil(accs.length/500)
-    const parser = new Parser(5, "accession,id,gene_names,protein_name,organism_name,organism_id,length,xref_refseq,ft_var_seq,cc_alternative_products")
+    const parser = new Parser(5, "accession,id,gene_names,protein_name,organism_name,organism_id,length,xref_refseq,ft_var_seq,cc_alternative_products,ft_domain")
     const res = await parser.parse((accs))
     const dataMap: Map<string, string> = new Map<string, string>()
     const db: Map<string, any> = new Map<string, any>()
@@ -55,5 +56,9 @@ export class UniprotService {
       currentRun ++
     }
     return {db: db, dataMap: dataMap, geneList: geneList}
+  }
+
+  getIndividualEntry(acc: string) {
+    return this.http.get(`https://rest.uniprot.org/uniprotkb/${acc}.json`, {observe: "body"})
   }
 }

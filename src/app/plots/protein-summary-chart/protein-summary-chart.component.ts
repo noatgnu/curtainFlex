@@ -2,6 +2,10 @@ import {Component, Input} from '@angular/core';
 import {DataFrame, IDataFrame, ISeries, Series} from "data-forge";
 import {DataService} from "../../services/data.service";
 import {PlotDataGeneric} from "../../interface/plot-data";
+import {PdbViewerModalComponent} from "../../modal/pdb-viewer-modal/pdb-viewer-modal.component";
+import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {UniprotService} from "../../services/uniprot.service";
+import {ProteinDomainModalComponent} from "../../modal/protein-domain-modal/protein-domain-modal.component";
 
 @Component({
   selector: 'app-bar-chart',
@@ -12,7 +16,12 @@ export class ProteinSummaryChartComponent {
   graphData: any[] = []
   graphDataAverage: any[] = []
   graphDataViolin: any[] = []
-
+  extraMetaDataDBID: string = ""
+  primaryID: string = ""
+  geneName: string = ""
+  proteinName: string = ""
+  uniprotAcc: string = ""
+  hasExtra: boolean = false
   graphLayout: any = {
     xaxis: {
       tickfont: {
@@ -37,7 +46,16 @@ export class ProteinSummaryChartComponent {
       text: "",
     }
   }
-
+  config: any = {
+    //modeBarButtonsToRemove: ["toImage"]
+    toImageButtonOptions: {
+      format: 'svg',
+      filename: this.primaryID+'_bar',
+      height: this.graphLayout.height,
+      width: this.graphLayout.width,
+      scale: 1
+    }
+  }
   graphLayoutAverage: any = {
     xaxis: {
       tickfont: {
@@ -57,7 +75,7 @@ export class ProteinSummaryChartComponent {
     },
     annotations: [],
     shapes: [],
-    margin: {r: 40, l: 40, b: 120, t: 100},
+    margin: {r: 40, l: 70, b: 120, t: 100},
     title: {
       text: "",
     }
@@ -82,7 +100,7 @@ export class ProteinSummaryChartComponent {
     },
     annotations: [],
     shapes: [],
-    margin: {r: 40, l: 40, b: 120, t: 100},
+    margin: {r: 40, l: 70, b: 120, t: 100},
     title: {
       text: "",
     }
@@ -96,15 +114,31 @@ export class ProteinSummaryChartComponent {
     selectedMap: {},
     barChartErrorType: "Standard Error",
   }
-
+  configAverage: any = {
+    //modeBarButtonsToRemove: ["toImage"]
+    toImageButtonOptions: {
+      format: 'svg',
+      filename: this.primaryID + '_average',
+      height: this.graphLayoutAverage.height,
+      width: this.graphLayoutAverage.width,
+      scale: 1
+    }
+  }
+  configViolin: any = {
+    //modeBarButtonsToRemove: ["toImage"]
+    toImageButtonOptions: {
+      format: 'svg',
+      filename: this.primaryID + '_violin',
+      height: this.graphLayoutViolin.height,
+      width: this.graphLayoutViolin.width,
+      scale: 1
+    }
+  }
   df: any = {}
 
   samples: any[] = []
 
-  extraMetaDataDBID: string = ""
-  primaryID: string = ""
-  geneName: string = ""
-  proteinName: string = ""
+  metaData: any = {}
   @Input() set data(value: PlotDataGeneric) {
     this.samples = value.samples
     for (const s in value.settings) {
@@ -118,17 +152,23 @@ export class ProteinSummaryChartComponent {
       this.extraMetaDataDBID = value.extraMetaDataDBID
       const data = this.dataService.getExtraMetaData(this.primaryID, this.extraMetaDataDBID)
       if (data) {
-
-        this.settings.plotTitle = `${data["Gene Names"]}<br>${value.df[value.form.primaryID]}`
+        this.metaData = data
+        this.hasExtra = true
+        this.settings.plotTitle = `<b>${data["Gene Names"]}</b><br>${value.df[value.form.primaryID]}`
         this.geneName = data["Gene Names"]
         this.proteinName = data["Protein names"]
+        this.uniprotAcc = data["Entry"]
+        console.log(data)
+        this.uniprot.getIndividualEntry(this.uniprotAcc).subscribe((data: any) => {
+
+        })
       }
     }
     this.drawGraph()
     this.drawGraphAverage()
   }
 
-  constructor(private dataService: DataService) {
+  constructor(private dataService: DataService, private modal: NgbModal, private uniprot: UniprotService) {
 
   }
 
@@ -192,6 +232,7 @@ export class ProteinSummaryChartComponent {
 
   drawGraphAverage() {
     this.graphLayoutAverage.title.text = this.settings.plotTitle
+    this.graphLayoutViolin.title.text = this.settings.plotTitle
     const tickvals: string[] = []
     const ticktext: string[] = []
     const graph: any = {}
@@ -299,5 +340,15 @@ export class ProteinSummaryChartComponent {
     this.graphLayoutAverage.xaxis.ticktext = ticktext
     this.graphLayoutViolin.xaxis.tickvals = tickvals
     this.graphLayoutViolin.xaxis.ticktext = ticktext
+  }
+
+  openPDBViewer() {
+    const ref = this.modal.open(PdbViewerModalComponent, {size: 'xl'})
+    ref.componentInstance.data = {geneName: this.geneName, uniprotAcc: this.uniprotAcc}
+  }
+
+  openProteinDomainViewer() {
+    const ref = this.modal.open(ProteinDomainModalComponent, {size: 'xl'})
+    ref.componentInstance.data = this.metaData
   }
 }

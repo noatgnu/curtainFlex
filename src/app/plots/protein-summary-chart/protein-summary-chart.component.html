@@ -5,27 +5,37 @@
         <p class="card-text">
           <b>Primary ID</b> {{primaryID}}<br>
         </p>
-        <p class="card-text">
-          <b>Gene name</b> {{geneName}}<br>
-        </p>
-        <p class="card-text">
-          <b>Protein name</b> {{proteinName}}<br>
-        </p>
+        <ng-container *ngIf="hasExtra">
+          <p class="card-text">
+            <b>Gene name</b> {{geneName}}<br>
+          </p>
+          <p class="card-text">
+            <b>Protein name</b> {{proteinName}}<br>
+          </p>
+        </ng-container>
+        <div class="d-flex">
+          <div class="p-2">
+            <button class="btn btn-sm btn-secondary" (click)="openPDBViewer()"><span><i class="bi-eye">View AlphaFold Structure</i></span></button>
+          </div>
+          <div class="p-2">
+            <button class="btn btn-sm btn-secondary" (click)="openProteinDomainViewer()">View Protein Functional Domain</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
   <div class="p-2 flex-fill">
     <div class="card">
       <div class="card-body">
-        <plotly-plot [data]="graphData" [layout]="graphLayout" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
-        <div class="d-flex">
-          <div class="p-2 flex-fill">
-            <plotly-plot [data]="graphDataAverage" [layout]="graphLayoutAverage" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
+        <plotly-plot [config]="config" [data]="graphData" [layout]="graphLayout" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
+        <hr>
+        <div class="row">
+          <div class="p-2 col-6">
+            <plotly-plot [config]="configAverage" [data]="graphDataAverage" [layout]="graphLayoutAverage" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
           </div>
-          <div class="p-2 flex-fill">
-            <plotly-plot [data]="graphDataViolin" [layout]="graphLayoutViolin" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
+          <div class="p-2 col-6">
+            <plotly-plot [config]="configViolin" [data]="graphDataViolin" [layout]="graphLayoutViolin" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
           </div>
-
         </div>
       </div>
     </div>

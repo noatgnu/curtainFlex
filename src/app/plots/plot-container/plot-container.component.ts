@@ -6,6 +6,8 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {BatchSearchModalComponent} from "../../modal/batch-search-modal/batch-search-modal.component";
 import {FormBuilder} from "@angular/forms";
 import {debounceTime, distinctUntilChanged, map, Observable, OperatorFunction} from "rxjs";
+import {PlotSettingsModalComponent} from "../../modal/plot-settings-modal/plot-settings-modal.component";
+import {PdbViewerModalComponent} from "../../modal/pdb-viewer-modal/pdb-viewer-modal.component";
 
 @Component({
   selector: 'app-plot-container',
@@ -173,4 +175,21 @@ export class PlotContainerComponent {
       plot.settings = settings
     }
   }
+
+  openSettingsModal() {
+    const ref = this.modal.open(PlotSettingsModalComponent)
+    ref.componentInstance.data = this.data
+    ref.closed.subscribe((data: any) => {
+      if (data) {
+        //copy data from this.data to a new object
+        const newData = {...this.data}
+        newData.settings.colorMap = data.colorMap
+        newData.samples = data.samples
+        newData.settings.sampleVisibility = data.sampleVisibility
+        this.data = newData
+      }
+    })
+  }
+
+
 }

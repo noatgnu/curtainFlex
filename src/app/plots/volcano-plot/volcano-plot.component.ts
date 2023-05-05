@@ -15,6 +15,8 @@ import {Subscription} from "rxjs";
 export class VolcanoPlotComponent implements OnDestroy{
   @Output() formChanged: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Output() settingsChanged: EventEmitter<any> = new EventEmitter<any>()
+
+
   graphData: any[] = []
   graphLayout: any = {
     height: 700, width: 700, xaxis: {title: "Log2FC"},
@@ -28,6 +30,17 @@ export class VolcanoPlotComponent implements OnDestroy{
       font: {
         size: 24
       },
+    }
+  }
+
+  config: any = {
+    //modeBarButtonsToRemove: ["toImage"]
+    toImageButtonOptions: {
+      format: 'svg',
+      filename: this.graphLayout.title.text,
+      height: this.graphLayout.height,
+      width: this.graphLayout.width,
+      scale: 1
     }
   }
 

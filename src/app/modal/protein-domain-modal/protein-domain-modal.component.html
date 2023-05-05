@@ -1,0 +1,9 @@
+<div class="modal-header">
+  <h4 class="modal-title">Protein Domain</h4>
+</div>
+<div class="modal-body">
+  <app-protein-domain [data]="data" *ngIf="data!==''"></app-protein-domain>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" (click)="close()">Close</button>
+</div>
