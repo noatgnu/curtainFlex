@@ -3,6 +3,7 @@ import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {DataFrame} from "data-forge";
 import {PlotData} from "../../interface/plot-data";
 import {FormBuilder, FormGroup} from "@angular/forms";
+import {DataService} from "../../services/data.service";
 
 @Component({
   selector: 'app-plot-settings-modal',
@@ -24,8 +25,17 @@ export class PlotSettingsModalComponent {
   sampleMap: any = {}
   sampleConditions: string[] = []
   colorMap: any = {}
+
+  private _filenameList: string[] = []
+  @Input() set filenameList(value: string[]) {
+    this._filenameList = value
+  }
+  get filenameList(): string[] {
+    return this._filenameList
+  }
   @Input() set data(value: PlotData) {
     this._data = value
+    this.formUniversal.controls["searchLinkTo"].setValue(this._data.searchLinkTo)
     switch (this._data.plotType) {
       case "bar-chart":
         const formComponents: any = {}
@@ -40,7 +50,6 @@ export class PlotSettingsModalComponent {
         for (const condition of this.sampleConditions) {
           this.colorMap[condition] = this._data.settings.colorMap[condition].slice()
         }
-        console.log(this.colorMap)
         this.form = this.fb.group(formComponents)
 
     }
@@ -51,8 +60,14 @@ export class PlotSettingsModalComponent {
   }
 
   form: FormGroup| undefined
+  formUniversal = this.fb.group({
+    searchLinkTo: [this._data.searchLinkTo,],
+    extraMetaDataDBID: ["",],
+  })
 
-  constructor (private modal: NgbActiveModal, private fb: FormBuilder) {
+  searchLinks: string[] = Array.from(this.dataService.searchSubject.keys())
+
+  constructor (private modal: NgbActiveModal, private fb: FormBuilder, private dataService: DataService) {
 
   }
 
@@ -61,8 +76,14 @@ export class PlotSettingsModalComponent {
     for (const condition of this.sampleConditions) {
       samples.push(...this.sampleMap[condition])
     }
-
-    this.modal.close({samples: samples, colorMap: this.colorMap, sampleVisibility: this.form?.value})
+    const result: any = {
+      searchLinkTo: this.formUniversal.value.searchLinkTo,
+      extraMetaDataDBID: this.formUniversal.value.extraMetaDataDBID,
+    }
+    result.sampleVisibility = this.form?.value
+    result.colorMap = this.colorMap
+    result.samples = samples
+    this.modal.close(result)
   }
 
   close() {

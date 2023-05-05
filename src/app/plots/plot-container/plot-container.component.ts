@@ -179,6 +179,10 @@ export class PlotContainerComponent {
   openSettingsModal() {
     const ref = this.modal.open(PlotSettingsModalComponent)
     ref.componentInstance.data = this.data
+    ref.componentInstance.filenameList = this.dataService.data.filenameList.filter((value) => {
+      return !!(this.dataService.data.files.get(value)?.extraMetaDataDBID && this.dataService.data.files.get(value)?.extraMetaDataDBID !== "");
+    })
+
     ref.closed.subscribe((data: any) => {
       if (data) {
         //copy data from this.data to a new object
@@ -186,6 +190,18 @@ export class PlotContainerComponent {
         newData.settings.colorMap = data.colorMap
         newData.samples = data.samples
         newData.settings.sampleVisibility = data.sampleVisibility
+        newData.searchLinkTo = data.searchLinkTo
+        const inputFile = this.dataService.data.files.get(this.data.filename)
+        if (inputFile) {
+          if (inputFile.extraMetaDataDBID) {
+            if (data.extraMetaDataDBID !== "" && data.extraMetaDataDBID !== inputFile.extraMetaDataDBID) {
+              if (newData.extraMetaDataDBID != null) {
+                inputFile.extraMetaDataDBID = newData.extraMetaDataDBID
+              }
+            }
+          }
+
+        }
         this.data = newData
       }
     })

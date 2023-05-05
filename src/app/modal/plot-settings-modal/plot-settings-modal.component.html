@@ -2,9 +2,23 @@
   <h4 class="modal-title">Plot Settings</h4>
 </div>
 <div class="modal-body">
+  <form [formGroup]="formUniversal">
+    <div class="form-group">
+      <label for="searchLink">Search Link To</label>
+      <select id="searchLink" class="form-control" formControlName="searchLinkTo">
+        <option *ngFor="let s of searchLinks" [value]="s">{{s}}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="metaData">Link Metadata To</label>
+      <select id="metaData" class="form-control" formControlName="extraMetaDataDBID">
+        <option *ngFor="let s of filenameList" [value]="s">{{s}}</option>
+      </select>
+    </div>
+  </form>
+  <hr>
   <form [formGroup]="form" *ngIf="form">
     <ng-container *ngFor="let c of sampleConditions">
-
       <div class="d-flex">
         <div class="p-2 me-auto">
           <p class="form-text">
