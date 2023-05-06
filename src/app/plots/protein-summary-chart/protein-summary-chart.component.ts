@@ -3,7 +3,7 @@ import {DataFrame, IDataFrame, ISeries, Series} from "data-forge";
 import {DataService} from "../../services/data.service";
 import {PlotDataGeneric} from "../../interface/plot-data";
 import {PdbViewerModalComponent} from "../../modal/pdb-viewer-modal/pdb-viewer-modal.component";
-import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {UniprotService} from "../../services/uniprot.service";
 import {ProteinDomainModalComponent} from "../../modal/protein-domain-modal/protein-domain-modal.component";
 

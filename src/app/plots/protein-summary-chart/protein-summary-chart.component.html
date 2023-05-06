@@ -12,15 +12,16 @@
           <p class="card-text">
             <b>Protein name</b> {{proteinName}}<br>
           </p>
+          <div class="d-flex">
+            <div class="p-2">
+              <button class="btn btn-sm btn-secondary" (click)="openPDBViewer()">View AlphaFold Structure</button>
+            </div>
+            <div class="p-2">
+              <button class="btn btn-sm btn-secondary" (click)="openProteinDomainViewer()">View Protein Functional Domain</button>
+            </div>
+          </div>
         </ng-container>
-        <div class="d-flex">
-          <div class="p-2">
-            <button class="btn btn-sm btn-secondary" (click)="openPDBViewer()"><span><i class="bi-eye">View AlphaFold Structure</i></span></button>
-          </div>
-          <div class="p-2">
-            <button class="btn btn-sm btn-secondary" (click)="openProteinDomainViewer()">View Protein Functional Domain</button>
-          </div>
-        </div>
+
       </div>
     </div>
   </div>

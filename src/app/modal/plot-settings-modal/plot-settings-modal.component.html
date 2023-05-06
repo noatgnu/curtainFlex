@@ -17,7 +17,7 @@
     </div>
   </form>
   <hr>
-  <form [formGroup]="form" *ngIf="form">
+  <form [formGroup]="form" *ngIf="form && data.plotType!=='volcano-plot'">
     <ng-container *ngFor="let c of sampleConditions">
       <div class="d-flex">
         <div class="p-2 me-auto">
