@@ -23,7 +23,8 @@ export class PlotContainerComponent {
     settings: null,
     samples: [],
     plotType: "",
-    searchLinkTo: ""
+    searchLinkTo: "",
+    ptm: false,
   }
 
   formChangeStatus: boolean = false
@@ -31,6 +32,7 @@ export class PlotContainerComponent {
   @Input() position: number = 0
 
   @Input() set data(value: PlotData) {
+    console.log(value)
     if (value !== this._data) {
       this._data = value
     }
@@ -83,7 +85,7 @@ export class PlotContainerComponent {
         for (const term of Object.keys(data.data)) {
           const pid = this.getSearchPID(term, data.searchType)
           if (pid) {
-            pids.push(pid)
+            pids.push(...pid)
           }
         }
         this.dataService.searchSubject.get(this.data.searchLinkTo)?.next({primaryIds: pids, searchType: data.searchType, title: data.title})
@@ -124,10 +126,10 @@ export class PlotContainerComponent {
     if (pid) {
       switch (searchType) {
         case 'gene-names':
-          this.dataService.searchSubject.get(this.data.searchLinkTo)?.next({primaryIds: [pid], type: 'gene-names', title: ""})
+          this.dataService.searchSubject.get(this.data.searchLinkTo)?.next({primaryIds: [...pid], type: 'gene-names', title: this.form.value.term})
           break
         case 'primary-id':
-          this.dataService.searchSubject.get(this.data.searchLinkTo)?.next({primaryIds: [pid], type: 'primary-id', title: ""})
+          this.dataService.searchSubject.get(this.data.searchLinkTo)?.next({primaryIds: [...pid], type: 'primary-id', title: ""})
           break
       }
     }

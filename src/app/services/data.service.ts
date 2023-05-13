@@ -18,9 +18,10 @@ export class DataService {
   plotsSubject: Subject<any> = new Subject<any>()
   data: {files: Map<string, InputFile>, filenameList: string[]} = {files: new Map<string, InputFile>(), filenameList: []}
   plotLists: PlotData[] = []
-
+  ptmMetaData: Map<string, any> = new Map<string, any>()
   extraMetaData: Map<string, any> = new Map<string, any>()
   searchSubject: Map<string, Subject<any>> = new Map<string, Subject<any>>()
+  showUniprotProgress: boolean = false
 
   currentSession: any = {
     id: "",
@@ -51,6 +52,9 @@ export class DataService {
         result = this.processScatterPlotForm(form, data, samples);
         break
       case 'bar-chart':
+        result = this.processBarChartForm(form, data, samples);
+        break
+      case 'ptm-bar-chart':
         result = this.processBarChartForm(form, data, samples);
         break
       case 'line-chart':
@@ -284,6 +288,9 @@ export class DataService {
       case "bar-chart":
         settings = this.defaultBarChartOptions
         break
+      case "ptm-bar-chart":
+        settings = this.defaultBarChartOptions
+        break
     }
     settings["id"] = crypto.randomUUID()
     return settings
@@ -330,7 +337,7 @@ export class DataService {
     if (df && meta) {
       const data = meta.primaryIDMap.get(primaryID)
       if (data) {
-        return this.getExtraMetaDataFromColumn(data, meta)
+        return this.getExtraMetaDataFromColumn(data[0], meta)
       }
     }
     return null
@@ -383,9 +390,13 @@ export class DataService {
       files[key]["df"] = ""
     })
     const extraMetaData: any = {}
+
     this.extraMetaData.forEach((value, key) => {
       if (value["form"]) {
-        extraMetaData[key] = value["form"]
+        extraMetaData[key] = {"form": value["form"]}
+      }
+      if (value["ptmForm"]) {
+        extraMetaData[key]["ptmForm"] = value["ptmForm"]
       }
     })
     const tobeExported: any = {
@@ -400,7 +411,8 @@ export class DataService {
           plotType: plot.plotType,
           samples: plot.samples,
           searchLinkTo: plot.searchLinkTo,
-          settings: plot.settings
+          settings: plot.settings,
+          ptm: plot.ptm,
         }
       }),
       extraMetaData: extraMetaData,
@@ -434,32 +446,35 @@ export class DataService {
     this.currentSession.loadingProgressMessage = "Loading data..."
     this.plotLists = []
     this.data = {files: new Map<string, InputFile>(), filenameList: jsonData.data.filenameList}
+    console.log(jsonData)
     for (const key in jsonData.data.files) {
       const inputFile = new InputFile(fromCSV(jsonData.data.files[key]["originalFile"]), jsonData.data.files[key].filename, jsonData.data.files[key]["originalFile"])
       this.data.files.set(key, inputFile)
       if (jsonData.extraMetaData[key]) {
         this.currentSession.loadingProgressMessage = `Processing ${jsonData.data.files[key].filename}...`
-        if (!jsonData.extraMetaData[key]["enableLink"]) {
+        if (!jsonData.extraMetaData[key]["form"]["enableLink"]) {
           const {
             accMap,
             primaryIDMap,
             accs
-          } = SelectExtraMetadataModalComponent.getAccs(jsonData.extraMetaData[key], inputFile.df)
+          } = SelectExtraMetadataModalComponent.getAccs(jsonData.extraMetaData[key]["form"], inputFile.df)
           if (accs.length > 0) {
             let meta: any = {}
-            switch (jsonData.extraMetaData[key]["source"]) {
+            switch (jsonData.extraMetaData[key]["form"]["source"]) {
               case "uniprot":
                 this.currentSession.loadingProgressMessage = `Getting extra metadata from UniProt for ${key}...`
+                this.showUniprotProgress = true
                 const uniResult = await this.uniprot.getUniprot(accs, accMap)
                 meta = {
                   db: uniResult.db,
                   dataMap: uniResult.dataMap,
-                  form: jsonData.extraMetaData[key],
+                  form: jsonData.extraMetaData[key]["form"],
+                  ptmForm: jsonData.extraMetaData[key]["ptmForm"],
                   accMap: accMap,
                   primaryIDMap: primaryIDMap,
                   geneList: uniResult.geneList
                 }
-
+                this.showUniprotProgress = false
                 break
             }
             if (Object.keys(meta).length > 0) {
@@ -476,9 +491,13 @@ export class DataService {
               }
             }
           }
+        } else {
+          inputFile.extraMetaDataDBID = jsonData.extraMetaData[key]["form"].linkTo
+          this.extraMetaData.set(inputFile.filename, {form: jsonData.extraMetaData[key]["form"], ptmForm: jsonData.extraMetaData[key]["ptmForm"]})
         }
       }
     }
+    console.log(this.data)
     for (const plot of jsonData.plotLists) {
       this.currentSession.loadingProgressMessage = `Processing plot ${plot.id}...`
       const p: PlotData = {
@@ -490,14 +509,16 @@ export class DataService {
         samples: plot.samples,
         plotType: plot.plotType,
         searchLinkTo: plot.searchLinkTo,
-        extraMetaDataDBID: plot.extraMetaDataDBID
+        extraMetaDataDBID: plot.extraMetaDataDBID,
+        ptm: plot.ptm,
       }
       const processed = this.processForm(p.df, p.form, p.plotType)
       p.df = processed.data
       this.searchSubject.set(p.id, new Subject<any>())
       this.addPlotToList(p)
-      this.currentSession.loadingProgressMessage = "Finished"
+
     }
+    this.currentSession.loadingProgressMessage = "Finished"
   }
 
   saveSessionToWeb() {
@@ -508,7 +529,6 @@ export class DataService {
         this.currentSession.id = res.data.link_id
         this.currentSession.data = res.data
         this.currentSession.link = location.origin + "/#/" + this.currentSession.id
-
       }
     }).catch((err) => {
       console.log(err)

@@ -1,0 +1,23 @@
+<div class="card">
+  <div class="card-body">
+    <p class="card-text">
+      <b>Protein ID</b> {{primaryId}}<br>
+    </p>
+    <ng-container *ngIf="hasExtra">
+      <p class="card-text">
+        <b>Gene name</b> {{geneName}}<br>
+      </p>
+      <p class="card-text">
+        <b>Protein name</b> {{proteinName}}<br>
+      </p>
+      <div class="d-flex">
+        <div class="p-2">
+          <button class="btn btn-sm btn-secondary" (click)="openPDBViewer()">View AlphaFold Structure</button>
+        </div>
+        <div class="p-2">
+          <button class="btn btn-sm btn-secondary" (click)="openProteinDomainViewer()">View Protein Functional Domain</button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

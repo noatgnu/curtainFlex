@@ -24,6 +24,11 @@
         <option *ngFor="let c of data.getColumnNames()" [value]="c">{{c}}</option>
       </select>
     </div>
+
+    <div class="form-check">
+      <input type="checkbox" formControlName="enableLink" id="enableLink" class="form-check-input">
+      <label for="enableLink" class="form-check-label">Link to another file's extra metadata instead</label>
+    </div>
     <div class="form-group" *ngIf="form.value['enableLink']===true">
       <label for="link">Link to another file</label>
       <select id="link" formControlName="linkTo" class="form-control">
@@ -31,14 +36,52 @@
       </select>
     </div>
     <div class="form-check">
-      <input type="checkbox" formControlName="enableLink" id="enableLink" class="form-check-input">
-      <label for="enableLink" class="form-check-label">Link to another file's extra metadata instead</label>
+      <input id="ptm" class="form-check-input" type="checkbox" formControlName="ptm">
+      <label for="ptm" class="form-check-label">File contain PTM data</label>
     </div>
   </form>
+
+  <ng-container *ngIf="form.value.ptm">
+    <form [formGroup]="ptmForm">
+      <div class="form-group">
+        <label for="proteinID">Protein ID</label>
+        <select formControlName="proteinID" class="form-control" id="proteinID">
+          <option *ngFor="let col of data.getColumnNames()" [value]="col">{{col}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="peptideSequence">Peptide Sequence</label>
+        <select formControlName="peptideSequence" class="form-control" id="peptideSequence">
+          <option *ngFor="let col of data.getColumnNames()" [value]="col">{{col}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="positionInPeptide">Position in Peptide</label>
+        <select formControlName="positionInPeptide" class="form-control" id="positionInPeptide">
+          <option *ngFor="let col of data.getColumnNames()" [value]="col">{{col}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="positionInProtein">Position in Protein</label>
+        <select formControlName="positionInProtein" class="form-control" id="positionInProtein">
+          <option *ngFor="let col of data.getColumnNames()" [value]="col">{{col}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="LocalizationProbability">Localization Probability</label>
+        <select formControlName="LocalizationProbability" class="form-control" id="LocalizationProbability">
+          <option *ngFor="let col of data.getColumnNames()" [value]="col">{{col}}</option>
+        </select>
+      </div>
+    </form>
+  </ng-container>
   <div class="p-2">
     <ngb-progressbar type="info" [value]="uniprot.progressValue">
       {{uniprot.progressText}}
     </ngb-progressbar>
+  </div>
+  <div class="p-2" *ngFor="let segment of uniprot.segments">
+    <app-uniprot-segment-progress [segment]="segment"></app-uniprot-segment-progress>
   </div>
 </div>
 <div class="modal-footer">

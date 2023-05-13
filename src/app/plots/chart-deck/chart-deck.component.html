@@ -11,8 +11,10 @@
 <hr>
 <ng-container *ngFor="let plot of plotDataArray| slice: (page-1)*pageSize:page*pageSize">
   <ng-container [ngSwitch]="plot.plotType">
-
-    <app-bar-chart *ngSwitchCase="'bar-chart'" [data]="plot"></app-bar-chart>
+    <div>
+      <app-bar-chart *ngSwitchCase="'bar-chart'" [data]="plot"></app-bar-chart>
+      <app-ptm-summary-chart *ngSwitchCase="'ptm-bar-chart'" [data]="plot"></app-ptm-summary-chart>
+    </div>
     <hr>
   </ng-container>
 </ng-container>

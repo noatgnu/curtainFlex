@@ -22,7 +22,7 @@ export class AppComponent implements OnInit{
   settings: any = {files: {}}
 
 
-  constructor(private modal: NgbModal, public dataService: DataService, private route: ActivatedRoute) {
+  constructor(private modal: NgbModal, public dataService: DataService, private route: ActivatedRoute, public uniprot: UniprotService) {
     this.route.params.subscribe(params => {
       console.log(params)
     })
@@ -65,7 +65,7 @@ export class AppComponent implements OnInit{
         }
       }
 
-      const plotSettings: PlotData = {id: result.plotTitle, filename: result.filename, df: results.data, form: result.form, settings: defaultSettings, plotType: result.plotType, samples: results.samples, extraMetaDataDBID: result.data.extraMetaDataDBID, searchLinkTo: result.searchLinkTo}
+      const plotSettings: PlotData = {id: result.plotTitle, filename: result.filename, df: results.data, form: result.form, settings: defaultSettings, plotType: result.plotType, samples: results.samples, extraMetaDataDBID: result.data.extraMetaDataDBID, searchLinkTo: result.searchLinkTo, ptm: result.ptm}
       if (result.searchLinkTo === "") {
         plotSettings.searchLinkTo = result.plotTitle
       }
@@ -93,9 +93,8 @@ export class AppComponent implements OnInit{
             }
           } else {
             df.extraMetaDataDBID = fileName
-
-            this.dataService.extraMetaData.set(df.extraMetaDataDBID, result)
           }
+          this.dataService.extraMetaData.set(fileName, result)
         }
       })
     }

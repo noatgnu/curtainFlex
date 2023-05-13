@@ -68,6 +68,7 @@ export class VolcanoPlotComponent implements OnDestroy{
   plotId = ""
 
   @Input() set data(value: PlotData) {
+    console.log(value)
     this.plotId = value.id
     this.fcColumn = value.form.foldChange
     this.pValueColumn = value.form.minuslog10pValue
@@ -138,7 +139,7 @@ export class VolcanoPlotComponent implements OnDestroy{
     xMin: 0, xMax: 0, yMin: 0, yMax: 0
   }
   drawGraph() {
-    this.graphLayout.title.text = this.settings.plotTitle
+    this.graphLayout.title.text = this.form.value.plotTitle
     const temp = this.prepareCategories()
     this.layoutMaxMin = {
       xMin: 0, xMax: 0, yMin: 0, yMax: 0

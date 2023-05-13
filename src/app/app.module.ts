@@ -30,6 +30,13 @@ import { PdbViewerModalComponent } from './modal/pdb-viewer-modal/pdb-viewer-mod
 import {HttpClientModule} from "@angular/common/http";
 import { ProteinDomainComponent } from './plots/protein-domain/protein-domain.component';
 import { ProteinDomainModalComponent } from './modal/protein-domain-modal/protein-domain-modal.component';
+import { PtmSummaryChartFormComponent } from './chart-selection/ptm-summary-chart-form/ptm-summary-chart-form.component';
+import { SideCardComponent } from './plots/side-card/side-card.component';
+import { BarComponent } from './plots/bar/bar.component';
+import { PtmSummaryChartComponent } from './plots/ptm-summary-chart/ptm-summary-chart.component';
+import { UniprotSegmentProgressComponent } from './utils/uniprot-segment-progress/uniprot-segment-progress.component';
+import { StringdbInteractiveComponent } from './plots/stringdb-interactive/stringdb-interactive.component';
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 PlotlyModule.plotlyjs = PlotlyJS;
 @NgModule({
@@ -55,7 +62,13 @@ PlotlyModule.plotlyjs = PlotlyJS;
     PlotSettingsModalComponent,
     PdbViewerModalComponent,
     ProteinDomainComponent,
-    ProteinDomainModalComponent
+    ProteinDomainModalComponent,
+    PtmSummaryChartFormComponent,
+    SideCardComponent,
+    BarComponent,
+    PtmSummaryChartComponent,
+    UniprotSegmentProgressComponent,
+    StringdbInteractiveComponent
   ],
   imports: [
     BrowserModule,
@@ -65,7 +78,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
     FormsModule,
     ReactiveFormsModule,
     ColorPickerModule,
-    HttpClientModule
+    HttpClientModule,
+    BrowserAnimationsModule
   ],
   providers: [
     NgbActiveModal

@@ -20,6 +20,7 @@ export class PlotSettingsModalComponent {
     samples: [],
     plotType: "",
     searchLinkTo: "",
+    ptm: false,
   }
 
   sampleMap: any = {}

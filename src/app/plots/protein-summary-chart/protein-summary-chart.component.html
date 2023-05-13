@@ -1,45 +1,9 @@
 <div class="d-flex">
   <div class="p-2" *ngIf="extraMetaDataDBID && extraMetaDataDBID !== ''" style="width: 400px">
-    <div class="card">
-      <div class="card-body">
-        <p class="card-text">
-          <b>Primary ID</b> {{primaryID}}<br>
-        </p>
-        <ng-container *ngIf="hasExtra">
-          <p class="card-text">
-            <b>Gene name</b> {{geneName}}<br>
-          </p>
-          <p class="card-text">
-            <b>Protein name</b> {{proteinName}}<br>
-          </p>
-          <div class="d-flex">
-            <div class="p-2">
-              <button class="btn btn-sm btn-secondary" (click)="openPDBViewer()">View AlphaFold Structure</button>
-            </div>
-            <div class="p-2">
-              <button class="btn btn-sm btn-secondary" (click)="openProteinDomainViewer()">View Protein Functional Domain</button>
-            </div>
-          </div>
-        </ng-container>
-
-      </div>
-    </div>
+    <app-side-card [data]="{hasExtra: hasExtra, metaData: metaData, primaryId: primaryID}"></app-side-card>
   </div>
   <div class="p-2 flex-fill">
-    <div class="card">
-      <div class="card-body">
-        <plotly-plot [config]="config" [data]="graphData" [layout]="graphLayout" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
-        <hr>
-        <div class="row">
-          <div class="p-2 col-6">
-            <plotly-plot [config]="configAverage" [data]="graphDataAverage" [layout]="graphLayoutAverage" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
-          </div>
-          <div class="p-2 col-6">
-            <plotly-plot [config]="configViolin" [data]="graphDataViolin" [layout]="graphLayoutViolin" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
-          </div>
-        </div>
-      </div>
-    </div>
+    <app-bar [data]="data"></app-bar>
   </div>
 </div>
 

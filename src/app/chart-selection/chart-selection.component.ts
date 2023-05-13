@@ -10,6 +10,7 @@ import {BarChartFormComponent} from "./bar-chart-form/bar-chart-form.component";
 import {LineChartFormComponent} from "./line-chart-form/line-chart-form.component";
 import {BoxPlotFormComponent} from "./box-plot-form/box-plot-form.component";
 import {PlotData} from "../interface/plot-data";
+import {PtmSummaryChartFormComponent} from "./ptm-summary-chart-form/ptm-summary-chart-form.component";
 
 @Component({
   selector: 'app-cha rt-selection',
@@ -23,11 +24,13 @@ export class ChartSelectionComponent implements AfterViewInit{
   @ViewChild(BarChartFormComponent) bar: BarChartFormComponent | undefined
   @ViewChild(LineChartFormComponent) line: LineChartFormComponent | undefined
   @ViewChild(BoxPlotFormComponent) box: BoxPlotFormComponent | undefined
+  @ViewChild(PtmSummaryChartFormComponent) ptmBar: PtmSummaryChartFormComponent | undefined
 
   _data: {files: Map<string, InputFile>, filenameList: string[]} = {files: new Map<string, InputFile>, filenameList: []}
   selectedFile: string = ""
-  selectedPlotType: string = "volcano-plot"
+  selectedPlotType: string = ""
   selectedDF: IDataFrame = new DataFrame()
+
   @Input() set data(value: {files: Map<string, InputFile>, filenameList: string[]}) {
     this._data = value
     this.initialForm.controls['filename'].setValue(this._data.filenameList[0] || '')
@@ -49,30 +52,35 @@ export class ChartSelectionComponent implements AfterViewInit{
   }
 
   plotTypeList = [
-    {name: 'Volcano Plot', value: 'volcano-plot', enable: true},
-    {name: 'Correlation Matrix', value: 'correlation-matrix', enable: false},
-    {name: 'Scatter Plot', value: 'scatter-plot', enable: false},
-    {name: 'Protein Intensity Data (Bar chart and violin plot)', value: 'bar-chart', enable: true},
-    {name: 'Line Chart', value: 'line-chart', enable: false},
-    {name: 'Box Plot', value: 'box-plot', enable: false},
+    {name: 'Volcano Plot', value: 'volcano-plot', enable: true, availableInPTM: true, all: true},
+    {name: 'Correlation Matrix', value: 'correlation-matrix', enable: false, availableInPTM: true, all: true},
+    {name: 'Scatter Plot', value: 'scatter-plot', enable: false, availableInPTM: true, all: true},
+    {name: 'Protein Intensity Data (Bar chart and violin plot)', value: 'bar-chart', enable: true, availableInPTM: false, all: false},
+    {name: 'PTM Intensity Data (Bar chart and violin plot)', value: 'ptm-bar-chart', enable: true, availableInPTM: true, all: false},
+    {name: 'Line Chart', value: 'line-chart', enable: false, availableInPTM: false, all: true},
+    {name: 'Box Plot', value: 'box-plot', enable: false, availableInPTM: false, all: true},
   ]
 
   initialForm = this.fb.group({
-    plotTitle: [crypto.randomUUID()],
-    plotType: ['volcano-plot'],
-    filename: [''],
-    searchLinkTo: [''],
+    plotTitle: [crypto.randomUUID(),],
+    plotType: [null,],
+    filename: ['',],
+    searchLinkTo: ['',],
+    ptm: [false,],
   })
 
 
+
   constructor(public activeModal: NgbActiveModal, private fb: FormBuilder, private changeDetectorRef: ChangeDetectorRef) {
+
+
     this.initialForm.controls['filename'].valueChanges.subscribe(value => {
       if (value) {
         this.selectedFile = value
         this.selectedDF = this.data.files.get(value)?.df || new DataFrame()
       }
     })
-    this.initialForm.controls['plotType'].valueChanges.subscribe(value => {
+    this.initialForm.controls['plotType'].valueChanges.subscribe((value:any) => {
       if (value) {
         this.selectedPlotType = value
         changeDetectorRef.detectChanges()
@@ -111,6 +119,10 @@ export class ChartSelectionComponent implements AfterViewInit{
     return this.box?.form
   }
 
+  get ptmBarForm() {
+    return this.ptmBar?.form
+  }
+
   get form() {
     switch (this.selectedPlotType) {
       case 'volcano-plot':
@@ -121,6 +133,8 @@ export class ChartSelectionComponent implements AfterViewInit{
         return this.scatterForm?.value
       case 'bar-chart':
         return this.barForm?.value
+      case 'ptm-bar-chart':
+        return this.ptmBarForm?.value
       case 'line-chart':
         return this.lineForm?.value
       case 'box-plot':
@@ -131,8 +145,17 @@ export class ChartSelectionComponent implements AfterViewInit{
   }
 
   submit() {
+    console.log(this.form)
     if (this.data.files.get(this.selectedFile)) {
-      this.activeModal.close({data: this.data.files.get(this.selectedFile), form: this.form, filename: this.selectedFile, plotType: this.selectedPlotType, plotTitle: this.initialForm.value['plotTitle'], searchLinkTo: this.initialForm.value['searchLinkTo']})
+      this.activeModal.close({
+        data: this.data.files.get(this.selectedFile),
+        form: this.form,
+        filename: this.selectedFile,
+        plotType: this.selectedPlotType,
+        plotTitle: this.initialForm.value['plotTitle'],
+        searchLinkTo: this.initialForm.value['searchLinkTo'],
+        ptm: this.initialForm.value['ptm'],
+      })
     }
   }
 }

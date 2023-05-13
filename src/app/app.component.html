@@ -69,6 +69,16 @@
           {{dataService.currentSession.loadingProgressMessage}}
         </ngb-progressbar>
       </p>
+      <ng-container *ngIf="dataService.showUniprotProgress">
+        <p>
+          <ngb-progressbar [striped]="true" [animated]="true" type="info" [value]="uniprot.progressValue">
+            {{uniprot.progressText}}
+          </ngb-progressbar>
+        </p>
+        <ng-container *ngFor="let seg of uniprot.segments">
+          <app-uniprot-segment-progress [segment]="seg"></app-uniprot-segment-progress>
+        </ng-container>
+      </ng-container>
     </div>
   </div>
 </div>

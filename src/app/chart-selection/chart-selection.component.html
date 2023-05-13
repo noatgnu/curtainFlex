@@ -9,11 +9,17 @@
       <label for="plotTitle">Plot unique title</label>
       <input formControlName="plotTitle" type="text" class="form-control" id="plotTitle" placeholder="Plot Title">
     </div>
+    <div class="form-check">
+      <input class="form-check-input" id="ptm" type="checkbox" formControlName="ptm">
+      <label class="form-check-label" for="ptm">PTM</label>
+    </div>
     <div class="form-group">
-      <label for="chartType">Chart Type</label>
+      <label for="chartType">Plot Type</label>
       <select class="form-control" id="chartType" formControlName="plotType">
         <ng-container *ngFor="let ct of plotTypeList">
-          <option  [value]="ct.value" *ngIf="ct.enable">{{ct.name}}</option>
+          <ng-container *ngIf="ct.enable">
+            <option  [value]="ct.value" *ngIf="ct.all || (ct.availableInPTM === initialForm.value.ptm)">{{ct.name}}</option>
+          </ng-container>
         </ng-container>
       </select>
     </div>
@@ -32,7 +38,7 @@
       </select>
     </div>
   </form>
-  <ng-container *ngIf="selectedDF.getColumnNames().length > 0">
+  <ng-container *ngIf="selectedDF.getColumnNames().length > 0 && selectedPlotType !== ''">
     <ng-container [ngSwitch]="selectedPlotType">
       <ng-container *ngSwitchCase="'volcano-plot'">
         <app-volcano-plot-form [columns]="selectedDF.getColumnNames()" #volcano></app-volcano-plot-form>
@@ -42,6 +48,9 @@
       </ng-container>
       <ng-container *ngSwitchCase="'bar-chart'">
         <app-bar-chart-form [columns]="selectedDF.getColumnNames()" #bar></app-bar-chart-form>
+      </ng-container>
+      <ng-container *ngSwitchCase="'ptm-bar-chart'">
+        <app-ptm-summary-chart-form [columns]="selectedDF.getColumnNames()" #ptmBar></app-ptm-summary-chart-form>
       </ng-container>
       <ng-container *ngSwitchCase="'box-plot'">
         <app-box-plot-form [columns]="selectedDF.getColumnNames()" #box></app-box-plot-form>

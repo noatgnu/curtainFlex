@@ -39,7 +39,19 @@ export class SelectExtraMetadataModalComponent {
     primaryID: ["", ],
     linkTo: ["",],
     enableLink: [false,],
+    ptm: [false,],
   })
+
+  ptmForm = this.fb.group({
+    foldChange: [''],
+    minuslog10pValue: [''],
+    proteinID: [''],
+    peptideSequence: [''],
+    positionInPeptide: [''],
+    positionInProtein: [''],
+    LocalizationProbability: [''],
+  })
+
   constructor(private fb: FormBuilder, private modal: NgbActiveModal, public uniprot: UniprotService) {
     this.uniprot.progressText = ""
     this.uniprot.progressValue = 0
@@ -58,14 +70,14 @@ export class SelectExtraMetadataModalComponent {
           switch (this.form.value["source"]) {
             case "uniprot":
               this.uniprot.getUniprot(accs, accMap).then((result) => {
-                this.modal.close({db: result.db, dataMap: result.dataMap, form: this.form.value, accMap: accMap, primaryIDMap: primaryIDMap, geneList: result.geneList})
+                this.modal.close({db: result.db, dataMap: result.dataMap, form: this.form.value, accMap: accMap, primaryIDMap: primaryIDMap, geneList: result.geneList, ptmForm: this.ptmForm.value})
               })
               break
           }
         }
       }
     } else {
-      this.modal.close({form: this.form.value})
+      this.modal.close({form: this.form.value, ptmForm: this.ptmForm.value})
     }
 
   }
@@ -76,8 +88,14 @@ export class SelectExtraMetadataModalComponent {
     const primaryIDMap = new Map<string, string[]>()
     const accs: string[] = []
     for (const r of data) {
-      primaryIDMap.set(r[form["primaryID"]], r[form["column"]])
-      primaryIDMap.set(r[form["column"]], r[form["primaryID"]])
+      if (!primaryIDMap.has(r[form["primaryID"]])) {
+        primaryIDMap.set(r[form["primaryID"]], [])
+      }
+      if (!primaryIDMap.has(r[form["column"]])) {
+        primaryIDMap.set(r[form["column"]], [])
+      }
+      primaryIDMap.get(r[form["primaryID"]])?.push(r[form["column"]])
+      primaryIDMap.get(r[form["column"]])?.push(r[form["primaryID"]])
       const accSplit = r[form["column"]].split(";")
       accMap.set(r[form["column"]], [r[form["column"]]])
       for (const acc of accSplit) {

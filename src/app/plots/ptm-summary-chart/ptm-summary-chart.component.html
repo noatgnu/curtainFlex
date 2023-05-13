@@ -1,0 +1,89 @@
+<div class="row" [@mouseInOut]="mouseIn ? 'in': 'out'" (mouseenter)="toggleIn()" (mouseleave)="toggleOut()">
+  <div class="col-3" *ngIf="extraMetaDataDBID && extraMetaDataDBID !== ''">
+    <app-side-card [data]="{hasExtra: hasExtra, metaData: metaData, primaryId: primaryID}"></app-side-card>
+  </div>
+  <div class="col-9">
+    <div class="card border-dark">
+      <div class="card-body">
+        <ul ngbNav #nav="ngbNav" class="nav-tabs">
+          <li ngbNavItem="table">
+            <button ngbNavLink>Intensity Data</button>
+            <ng-template ngbNavContent>
+              <table class="table">
+                <thead>
+                <tr>
+                  <th scope="col">
+                    Primary ID
+                  </th>
+                  <th scope="col">
+                    Fold Change
+                  </th>
+                  <th scope="col">
+                    P-Value
+                  </th>
+                  <th scope="col">
+                    Position in Peptide
+                  </th>
+                  <th scope="col">
+                    Position in Protein
+                  </th>
+                  <th scope="col">
+                    Sequence
+                  </th>
+                  <th scope="col">
+                    Action
+                  </th>
+                </tr>
+                </thead>
+                <tbody>
+                <ng-container *ngFor="let ptm of ptmPlotArray">
+                  <tr>
+                    <td>
+                      {{ptm.df[data.form.primaryID]}}
+                    </td>
+                    <td>
+                      {{ptm.df[extra.ptmForm.foldChange]}}
+                    </td>
+                    <td>
+                      {{ptm.df[extra.ptmForm.minuslog10pValue]}}
+                    </td>
+                    <td>
+                      {{ptm.df[extra.ptmForm.positionInPeptide]}}
+                    </td>
+                    <td>
+                      {{ptm.df[extra.ptmForm.positionInProtein]}}
+                    </td>
+                    <td>
+                      {{ptm.df[extra.ptmForm.peptideSequence]}}
+                    </td>
+                    <td class="d-flex">
+                      <div class="p-2">
+                        <button class="btn btn-sm btn-outline-primary" [ngbTooltip]="'Toggle Visualization'" (click)="toggleVisual(ptm.df[data.form.primaryID])"><i class="bi bi-file-bar-graph"></i></button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="visualizationState[ptm.df[data.form.primaryID]]">
+                    <td colspan="7">
+                      <app-bar [data]="ptm"></app-bar>
+                    </td>
+                  </tr>
+                </ng-container>
+                </tbody>
+              </table>
+            </ng-template>
+          </li>
+          <li ngbNavItem="ptmViewer">
+            <button ngbNavLink>PTM Position Viewer</button>
+            <ng-template ngbNavContent>
+
+            </ng-template>
+          </li>
+        </ul>
+        <div [ngbNavOutlet]="nav"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+

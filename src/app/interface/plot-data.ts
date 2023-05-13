@@ -10,6 +10,7 @@ export interface PlotData {
   plotType: string;
   searchLinkTo: string;
   extraMetaDataDBID?: string;
+  ptm: boolean;
 }
 
 export interface PlotDataGeneric {
