@@ -11,6 +11,9 @@ import {
 import {UniprotService} from "./services/uniprot.service";
 import {Subject} from "rxjs";
 import {ActivatedRoute} from "@angular/router";
+import {
+  ImportedDataManagementModalComponent
+} from "./modal/imported-data-management-modal/imported-data-management-modal.component";
 
 @Component({
   selector: 'app-root',
@@ -108,7 +111,6 @@ export class AppComponent implements OnInit{
     if (e.target) {
       const target = e.target as HTMLInputElement;
       if (target.files) {
-        console.log(target.files)
         this.dataService.loadSessionFromFile(target.files[0])
       }
     }
@@ -116,5 +118,19 @@ export class AppComponent implements OnInit{
 
   saveToWeb() {
     this.dataService.saveSessionToWeb()
+  }
+
+  openImportedDataManagementModal() {
+    const ref = this.modal.open(ImportedDataManagementModalComponent, {size: "xl"})
+    const data: any = {...this.dataService.data}
+    data["extraMetaData"] = this.dataService.extraMetaData
+    data["plotLists"] = this.dataService.plotLists
+    ref.componentInstance.data = data
+    ref.closed.subscribe((result) => {
+      this.dataService.data.files = result.files
+      this.dataService.data.filenameList = result.filenameList
+      this.dataService.extraMetaData = result.extraMetaData
+      this.dataService.plotLists = result.plotLists
+    })
   }
 }

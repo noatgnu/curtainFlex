@@ -16,8 +16,8 @@
               </button>
               <div ngbDropdownMenu aria-labelledby="plotDropdown">
                 <a class="dropdown-item" (click)="openChartSelection()"><i class="bi-graph-up-arrow"></i> Add Plot</a>
-                <a class="dropdown-item"><i class="bi-graph-down-arrow"></i> Remove Plot</a>
-                <a class="dropdown-item"><i class="bi-file-bar-graph-fill"></i> Plot Management</a>
+<!--                <a class="dropdown-item"><i class="bi-graph-down-arrow"></i> Remove Plot</a>-->
+<!--                <a class="dropdown-item"><i class="bi-file-bar-graph-fill"></i> Plot Management</a>-->
               </div>
             </div>
           </li>
@@ -31,7 +31,7 @@
                 <a class="dropdown-item" (click)="saveToWeb()"><i class="bi-download"></i> Save Session</a>
                 <a class="dropdown-item" (click)="exportToFile()"><i class="bi-database-down"></i> Export Session To File</a>
                 <a class="dropdown-item" (click)="sessionFileUpload.click()"><i class="bi-database"></i> Load Session From File</a>
-                <a class="dropdown-item"><i class="bi-database-gear"></i> Data Management</a>
+                <a class="dropdown-item" (click)="openImportedDataManagementModal()"><i class="bi-database-gear"></i> Data Management</a>
               </div>
             </div>
           </li>
