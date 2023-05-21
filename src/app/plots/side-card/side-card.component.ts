@@ -18,13 +18,15 @@ export class SideCardComponent {
   hasExtra: boolean = false
   primaryId: string = ""
   proteinName: string = ""
+  relatedVolcano: any = {}
   @Input() set data(value: any) {
     this.hasExtra = value["hasExtra"]
-    this.primaryId = value["primaryId"]
+    this.primaryId = value["primaryID"]
     this.geneName = value["metaData"]["Gene Names"]
     this.uniprotAcc = value["metaData"]["Entry"]
     this.proteinName = value["metaData"]["Protein names"]
     this.metaData = value["metaData"]
+    this.relatedVolcano = value["relatedVolcano"]
   }
 
   constructor(private modal: NgbModal) { }

@@ -60,7 +60,7 @@ export class AppComponent implements OnInit{
     modalRef.componentInstance.data = this.dataService.data
     modalRef.componentInstance.plotList = this.dataService.plotLists
     modalRef.closed.subscribe((result) => {
-      const results = this.dataService.processForm(result.data.df, result.form, result.plotType)
+      const results = this.dataService.processForm(result.plotTitle, result.data.df, result.form, result.plotType)
       const defaultSettings: any = this.dataService.getDefaultsPlotOptions(result.plotType)
       if ("sampleVisibility" in defaultSettings) {
         for (const sample of results.samples) {

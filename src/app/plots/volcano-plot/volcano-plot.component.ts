@@ -5,7 +5,7 @@ import {PlotData} from "../../interface/plot-data";
 import {FormBuilder} from "@angular/forms";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {VolcanoSelectionModalComponent} from "./volcano-selection-modal/volcano-selection-modal.component";
-import {Subscription} from "rxjs";
+import {Subject, Subscription} from "rxjs";
 
 @Component({
   selector: 'app-volcano-plot',
@@ -61,15 +61,17 @@ export class VolcanoPlotComponent implements OnDestroy{
     fcCutOff: 0.6,
     manualAxis: false,
     pointSize: 10,
+    visible: {}
   }
 
   df: IDataFrame = new DataFrame()
   extraMetaDataDBID: string = ""
   plotId = ""
-
+  searchLinkTo = ""
   @Input() set data(value: PlotData) {
-    console.log(value)
     this.plotId = value.id
+    this.searchLinkTo = value.searchLinkTo
+    this.dataService.plotUpdateSubjectMap.set(value.searchLinkTo, new Subject<any>())
     this.fcColumn = value.form.foldChange
     this.pValueColumn = value.form.minuslog10pValue
     this.primaryIDColumn = value.form.primaryID
@@ -85,7 +87,7 @@ export class VolcanoPlotComponent implements OnDestroy{
     if (this.subscription) {
       this.subscription.unsubscribe()
     }
-    this.subscription = this.dataService.searchSubject.get(this.plotId)?.asObservable().subscribe((value) => {
+    this.subscription = this.dataService.searchSubject.get(value.searchLinkTo)?.asObservable().subscribe((value) => {
       if (value) {
         if (value.title === "") {
           for (const primaryId of value.primaryIds) {
@@ -94,6 +96,7 @@ export class VolcanoPlotComponent implements OnDestroy{
         } else {
           if (!this.settings.categories.includes(value.title)) {
             this.settings.categories.push(value.title)
+            this.settings.visible[value.title] = true
           }
           for (const d of value.primaryIds) {
             if (!this.settings.selectedMap[d]) {
@@ -139,11 +142,19 @@ export class VolcanoPlotComponent implements OnDestroy{
     xMin: 0, xMax: 0, yMin: 0, yMax: 0
   }
   drawGraph() {
+    if (!this.settings.visible) {
+      this.settings.visible = {}
+    }
     this.graphLayout.title.text = this.form.value.plotTitle
+    this.dataService.differentialMap.set(this.plotId, {increase: {}, decrease: {}, notSignificant: {}})
     const temp = this.prepareCategories()
     this.layoutMaxMin = {
       xMin: 0, xMax: 0, yMin: 0, yMax: 0
     }
+    const ylog = -Math.log10(this.settings.pCutOff)
+    const increase: {[key: string]: {fc: number, p: number}} = {}
+    const decrease: {[key: string]: {fc: number, p: number}} = {}
+    const notSignificant: {[key: string]: {fc: number, p: number}} = {}
 
     this.settings.volcanoAxis.minX = this.form.value['minX']
     this.settings.volcanoAxis.maxX = this.form.value['maxX']
@@ -188,6 +199,18 @@ export class VolcanoPlotComponent implements OnDestroy{
           dataText = `${extra["Gene Names"]}<br>${primaryID}`
         }
       }
+
+
+      if (ylog > pValue && Math.abs(fc) > this.settings.fcCutOff) {
+        if (fc > 0) {
+          increase[primaryID] = {fc, p: pValue}
+        } else {
+          decrease[primaryID] = {fc, p: pValue}
+        }
+      } else {
+        notSignificant[primaryID] = {fc, p: pValue}
+      }
+
       if (primaryID in this.settings.selectedMap) {
         for (const category of this.settings.selectedMap[primaryID]) {
           temp[category]["x"].push(fc)
@@ -233,12 +256,15 @@ export class VolcanoPlotComponent implements OnDestroy{
     const graphData: any[] = []
     for (const t in temp) {
       if (temp[t].x.length > 0) {
+        if (t in this.settings.visible) {
+          temp[t].visible = this.settings.visible[t]
+        }
         graphData.push(temp[t])
       }
     }
 
     this.modifyLayout()
-
+    this.dataService.differentialMap.set(this.plotId, {increase, decrease, notSignificant})
     this.graphData = graphData.reverse()
     this.colorKeys = Object.keys(this.settings.colorMap)
 
@@ -365,8 +391,15 @@ export class VolcanoPlotComponent implements OnDestroy{
 
   clickDataPoint(event: any) {
     const primaryID = event.points[0].data.primaryID[event.points[0].pointNumber]
-    this.addDataToSelection(primaryID)
-    this.drawGraph()
+    //this.addDataToSelection(primaryID)
+    const extra = this.dataService.getExtraMetaData(primaryID, this.extraMetaDataDBID)
+    if (extra) {
+      const category = `${extra["Gene Names"]} (${primaryID})`
+      this.dataService.searchSubject.get(this.searchLinkTo)?.next({title: category, primaryIds: [primaryID]})
+    }
+
+    //this.drawGraph()
+    //this.dataService.plotUpdateSubjectMap.get(this.plotId)?.next(true)
   }
 
   selectDataPoints(event: any) {
@@ -388,7 +421,9 @@ export class VolcanoPlotComponent implements OnDestroy{
       const ref = this.modal.open(VolcanoSelectionModalComponent, {size: "lg"})
       ref.componentInstance.data = data
       ref.closed.subscribe((result) => {
-        if (result.title !== "") {
+        this.dataService.searchSubject.get(this.searchLinkTo)?.next({title: result.title, primaryIds: data.map(d => d.primaryID)})
+      })
+        /*if (result.title !== "") {
           if (!this.settings.categories.includes(result.title)) {
             this.settings.categories.push(result.title)
           }
@@ -406,9 +441,7 @@ export class VolcanoPlotComponent implements OnDestroy{
           }
         }
 
-        this.drawGraph()
-      })
-
+        this.drawGraph()*/
     }
   }
 
@@ -418,6 +451,7 @@ export class VolcanoPlotComponent implements OnDestroy{
       const category = `${extra["Gene Names"]} (${primaryID})`
       if (!this.settings.categories.includes(category)) {
         this.settings.categories.push(category)
+        this.settings.visible[category] = true
         if (!this.settings.selectedMap[primaryID]) {
           this.settings.selectedMap[primaryID] = []
         }
@@ -425,6 +459,14 @@ export class VolcanoPlotComponent implements OnDestroy{
           this.settings.selectedMap[primaryID].push(category)
         }
       }
+    }
+  }
+
+  legendClickHandler(event: any) {
+    if (event.event.srcElement.__data__[0].trace.visible === "legendonly") {
+      this.settings.visible[event.event.srcElement.__data__[0].trace.name] = true
+    } else {
+      this.settings.visible[event.event.srcElement.__data__[0].trace.name] = "legendonly"
     }
   }
 

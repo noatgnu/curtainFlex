@@ -33,13 +33,17 @@ export class ChartDeckComponent implements OnDestroy{
   page: number = 1
 
   pageSize: number = 5
-
+  relatedVolcano: any = {}
   @Input() set data(value: PlotData) {
     if (value !== this._data) {
       console.log(value)
       this.plotDataArray = []
       this.filteredData = new DataFrame()
       this._data = value
+      const relatedVolcano = this.dataService.plotLists.find(x => x.filename === value.extraMetaDataDBID && x.plotType==="volcano-plot")
+      if (relatedVolcano) {
+        this.relatedVolcano = relatedVolcano
+      }
       for (let i = 0; i < this._data.samples.length; i++) {
         if (!(this._data.samples[i].condition in this._data.settings.colorMap)) {
           const colorIndex = i % this.dataService.palette.pastel.length

@@ -22,6 +22,8 @@ export class DataService {
   extraMetaData: Map<string, any> = new Map<string, any>()
   searchSubject: Map<string, Subject<any>> = new Map<string, Subject<any>>()
   showUniprotProgress: boolean = false
+  differentialMap: Map<string, {increase: {[key: string]: {fc: number, p: number}}, decrease: {[key: string]: {fc: number, p: number}}, notSignificant: {[key: string]: {fc: number, p: number}}}> = new Map<string, any>()
+  plotUpdateSubjectMap: Map<string, Subject<any>> = new Map<string, Subject<any>>()
 
   currentSession: any = {
     id: "",
@@ -38,30 +40,30 @@ export class DataService {
     })
   }
 
-  processForm(data: IDataFrame, form: any, plotType: string): {form: any, samples: {sample: string, replicate: string, column: string}[], data: IDataFrame, plotType: string} {
+  processForm(id: string, data: IDataFrame, form: any, plotType: string): {form: any, samples: {sample: string, replicate: string, column: string}[], data: IDataFrame, plotType: string} {
     let samples: {condition: string, replicate: string, column: string}[] = []
     let result: any = {}
     switch (plotType) {
       case 'volcano-plot':
-        result = this.processVolcanoPlotForm(form, data, samples);
+        result = this.processVolcanoPlotForm(id, form, data, samples);
         break;
       case 'heatmap':
-        result = this.processCorrelationMatrixForm(form, data, samples);
+        result = this.processCorrelationMatrixForm(id, form, data, samples);
         break
       case 'scatter-plot':
-        result = this.processScatterPlotForm(form, data, samples);
+        result = this.processScatterPlotForm(id, form, data, samples);
         break
       case 'bar-chart':
-        result = this.processBarChartForm(form, data, samples);
+        result = this.processBarChartForm(id, form, data, samples);
         break
       case 'ptm-bar-chart':
-        result = this.processBarChartForm(form, data, samples);
+        result = this.processBarChartForm(id, form, data, samples);
         break
       case 'line-chart':
-        result = this.processLineChartForm(form, data, samples);
+        result = this.processLineChartForm(id, form, data, samples);
         break
       case 'box-plot':
-        result = this.processBoxPlotForm(form, data, samples);
+        result = this.processBoxPlotForm(id, form, data, samples);
         break
     }
     result["plotType"] = plotType
@@ -75,7 +77,7 @@ export class DataService {
 
 
 
-  private processVolcanoPlotForm(form: any, data: IDataFrame<number, any>, samples: {
+  private processVolcanoPlotForm(id: string, form: any, data: IDataFrame<number, any>, samples: {
     condition: string;
     replicate: string;
     column: string
@@ -95,7 +97,7 @@ export class DataService {
     return {form: form, samples: samples, data: data}
   }
 
-  private processCorrelationMatrixForm(form: any, data: IDataFrame<number, any>, samples: {
+  private processCorrelationMatrixForm(id: string, form: any, data: IDataFrame<number, any>, samples: {
     condition: string;
     replicate: string;
     column: string
@@ -143,7 +145,7 @@ export class DataService {
     return newCol
   }
 
-  private processScatterPlotForm(form: any, data: IDataFrame, samples: {condition: string; replicate: string; column: string}[]) {
+  private processScatterPlotForm(id: string, form: any, data: IDataFrame, samples: {condition: string; replicate: string; column: string}[]) {
 
     data = data.withSeries(form["xAxis"], new Series(this.convertToNumber(data.getSeries(form["xAxis"]).toArray()))).bake()
     data = data.withSeries(form["yAxis"], new Series(this.convertToNumber(data.getSeries(form["yAxis"]).toArray()))).bake()
@@ -151,7 +153,7 @@ export class DataService {
     return {form: form, samples: samples, data: data}
   }
 
-  private processBarChartForm(form: any, data: IDataFrame, samples: {condition: string; replicate: string; column: string}[]) {
+  private processBarChartForm(id: string, form: any, data: IDataFrame, samples: {condition: string; replicate: string; column: string}[]) {
     if (form["samples"]) {
       // Split the sample label into condition and replicate id by the last period
       // @ts-ignore
@@ -171,7 +173,7 @@ export class DataService {
     return {form: form, samples: samples, data: data}
   }
 
-  private processLineChartForm(form: any, data: IDataFrame, samples: {condition: string; replicate: string; column: string}[]) {
+  private processLineChartForm(id: string, form: any, data: IDataFrame, samples: {condition: string; replicate: string; column: string}[]) {
     if (form["samples"]) {
       // Split the sample label into condition and replicate id by the last period
       // @ts-ignore
@@ -190,7 +192,7 @@ export class DataService {
     return {form: form, samples: samples, data: data}
   }
 
-  private processBoxPlotForm(form: any, data: IDataFrame, samples: {condition: string; replicate: string; column: string}[]) {
+  private processBoxPlotForm(id: string, form: any, data: IDataFrame, samples: {condition: string; replicate: string; column: string}[]) {
     if (form["samples"]) {
       // Split the sample label into condition and replicate id by the last period
       // @ts-ignore
@@ -268,6 +270,7 @@ export class DataService {
     selectedMap: {},
     pCutOff: 0.05,
     fcCutOff: 0.6,
+    visible: {}
   }
 
   defaultBarChartOptions: any = {
@@ -512,7 +515,7 @@ export class DataService {
         extraMetaDataDBID: plot.extraMetaDataDBID,
         ptm: plot.ptm,
       }
-      const processed = this.processForm(p.df, p.form, p.plotType)
+      const processed = this.processForm(p.id, p.df, p.form, p.plotType)
       p.df = processed.data
       this.searchSubject.set(p.id, new Subject<any>())
       this.addPlotToList(p)

@@ -38,6 +38,7 @@ import { UniprotSegmentProgressComponent } from './utils/uniprot-segment-progres
 import { StringdbInteractiveComponent } from './plots/stringdb-interactive/stringdb-interactive.component';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { ImportedDataManagementModalComponent } from './modal/imported-data-management-modal/imported-data-management-modal.component';
+import { StringDbComponent } from './plots/string-db/string-db.component';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 @NgModule({
@@ -70,7 +71,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
     PtmSummaryChartComponent,
     UniprotSegmentProgressComponent,
     StringdbInteractiveComponent,
-    ImportedDataManagementModalComponent
+    ImportedDataManagementModalComponent,
+    StringDbComponent
   ],
   imports: [
     BrowserModule,

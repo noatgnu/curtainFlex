@@ -21,6 +21,7 @@ export class ProteinSummaryChartComponent {
 
 
   metaData: any = {}
+  relatedVolcano: any = {}
   @Input() set data(value: PlotDataGeneric) {
 
     this.primaryID = value.df[value.form.primaryID]
@@ -31,6 +32,7 @@ export class ProteinSummaryChartComponent {
         this.metaData = data
         this.hasExtra = true
       }
+
     }
 
     this._data = value

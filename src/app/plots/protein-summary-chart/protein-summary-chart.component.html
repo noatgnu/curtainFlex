@@ -1,6 +1,6 @@
 <div class="d-flex">
   <div class="p-2" *ngIf="extraMetaDataDBID && extraMetaDataDBID !== ''" style="width: 400px">
-    <app-side-card [data]="{hasExtra: hasExtra, metaData: metaData, primaryId: primaryID}"></app-side-card>
+    <app-side-card [data]="{hasExtra: hasExtra, metaData: metaData, primaryID: primaryID, relatedVolcano}"></app-side-card>
   </div>
   <div class="p-2 flex-fill">
     <app-bar [data]="data"></app-bar>

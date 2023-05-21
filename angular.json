@@ -32,7 +32,9 @@
               "node_modules/bootstrap-icons/font/bootstrap-icons.scss",
               "src/styles.less"
             ],
-            "scripts": []
+            "scripts": [
+              "src/assets/combined_embedded_network_v2.0.3.js"
+            ]
           },
           "configurations": {
             "production": {

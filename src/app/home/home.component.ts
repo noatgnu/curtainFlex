@@ -26,6 +26,7 @@ export class HomeComponent {
           }
           if (this.data.currentSession.id !== settings[0]) {
             this.data.currentSession.id = settings[0]
+            this.data.currentSession.link = location.origin + "/#/" + this.data.currentSession.id
             this.accounts.curtainAPI.getSessionSettings(settings[0]).then((d:any)=> {
               this.data.currentSession.data = d.data
               this.accounts.curtainAPI.postSettings(settings[0], token).then((data:any) => {
