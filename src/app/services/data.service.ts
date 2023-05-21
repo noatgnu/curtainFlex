@@ -270,7 +270,8 @@ export class DataService {
     selectedMap: {},
     pCutOff: 0.05,
     fcCutOff: 0.6,
-    visible: {}
+    visible: {},
+    annotations: {}
   }
 
   defaultBarChartOptions: any = {
@@ -280,6 +281,7 @@ export class DataService {
     categories: [],
     selectedMap: {},
     barChartErrorType: "Standard Error",
+    annotations: {}
   }
 
   getDefaultsPlotOptions(plotType: string) {

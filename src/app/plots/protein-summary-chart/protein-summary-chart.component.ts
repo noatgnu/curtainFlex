@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {DataFrame, IDataFrame, ISeries, Series} from "data-forge";
 import {DataService} from "../../services/data.service";
 import {PlotDataGeneric} from "../../interface/plot-data";
@@ -6,6 +6,8 @@ import {PdbViewerModalComponent} from "../../modal/pdb-viewer-modal/pdb-viewer-m
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {UniprotService} from "../../services/uniprot.service";
 import {ProteinDomainModalComponent} from "../../modal/protein-domain-modal/protein-domain-modal.component";
+import {FormBuilder} from "@angular/forms";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-bar-chart',
@@ -32,16 +34,43 @@ export class ProteinSummaryChartComponent {
         this.metaData = data
         this.hasExtra = true
       }
-
     }
-
     this._data = value
+    if (this.data.settings.annotations) {
+      this.form = this.fb.group({
+        toggleAnnotation: [this.data.settings.annotations[this.primaryID],],
+      })
+      if (this.subscription) {
+        this.subscription.unsubscribe()
+      }
+      this.subscription = this.form.controls.toggleAnnotation.valueChanges.subscribe((value) => {
+        if (value !== null) {
+          this.toggleAnnotation.emit(value)
+        }
+      })
+    }
   }
+
+
+  @Output() toggleAnnotation: EventEmitter<boolean> = new EventEmitter<boolean>()
   get data(): PlotDataGeneric {
     return this._data
   }
-  constructor(private dataService: DataService, private modal: NgbModal, private uniprot: UniprotService) {
 
+  form = this.fb.group({
+    toggleAnnotation: [false,],
+  })
+
+  subscription: Subscription|undefined
+
+  constructor(private dataService: DataService, private fb: FormBuilder) {
+    this.form.controls.toggleAnnotation.valueChanges.subscribe((value) => {
+      if (value !== null) {
+        this.toggleAnnotation.emit(value)
+      }
+    })
   }
+
+
 
 }

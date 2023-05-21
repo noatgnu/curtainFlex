@@ -153,4 +153,20 @@ export class ChartDeckComponent implements OnDestroy{
     }
   }
 
+  annotationHandler(event: boolean, primaryID: string) {
+    if (!this.data.settings.annotations) {
+      this.data.settings.annotations = {}
+    }
+    this.data.settings.annotations[primaryID] = event
+    if (event) {
+      this.dataService.searchSubject.get(this.data.searchLinkTo)?.next({
+        operation: "add-annotation", primaryIds: [primaryID]
+      })
+    } else {
+      this.dataService.searchSubject.get(this.data.searchLinkTo)?.next({
+        operation: "remove-annotation", primaryIds: [primaryID]
+      })
+    }
+
+  }
 }

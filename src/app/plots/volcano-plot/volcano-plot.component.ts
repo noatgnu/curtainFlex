@@ -61,7 +61,8 @@ export class VolcanoPlotComponent implements OnDestroy{
     fcCutOff: 0.6,
     manualAxis: false,
     pointSize: 10,
-    visible: {}
+    visible: {},
+    annotations: {}
   }
 
   df: IDataFrame = new DataFrame()
@@ -89,25 +90,35 @@ export class VolcanoPlotComponent implements OnDestroy{
     }
     this.subscription = this.dataService.searchSubject.get(value.searchLinkTo)?.asObservable().subscribe((value) => {
       if (value) {
-        if (value.title === "") {
-          for (const primaryId of value.primaryIds) {
-            this.addDataToSelection(primaryId)
-          }
-        } else {
-          if (!this.settings.categories.includes(value.title)) {
-            this.settings.categories.push(value.title)
-            this.settings.visible[value.title] = true
-          }
-          for (const d of value.primaryIds) {
-            if (!this.settings.selectedMap[d]) {
-              this.settings.selectedMap[d] = []
+        switch (value.operation) {
+          case "data-selection":
+            if (value.title === "") {
+              for (const primaryId of value.primaryIds) {
+                this.addDataToSelection(primaryId)
+              }
+            } else {
+              if (!this.settings.categories.includes(value.title)) {
+                this.settings.categories.push(value.title)
+                this.settings.visible[value.title] = true
+              }
+              for (const d of value.primaryIds) {
+                if (!this.settings.selectedMap[d]) {
+                  this.settings.selectedMap[d] = []
+                }
+                if (!this.settings.selectedMap[d].includes(value.title)) {
+                  this.settings.selectedMap[d].push(value.title)
+                }
+              }
             }
-            if (!this.settings.selectedMap[d].includes(value.title)) {
-              this.settings.selectedMap[d].push(value.title)
-            }
-          }
+            this.drawGraph()
+            break
+          case "add-annotation":
+            this.annotateDataPoint(value.primaryIds)
+            break
+          case "remove-annotation":
+            this.deleteAnnotation(value.primaryIds)
+            break
         }
-        this.drawGraph()
       }
     })
 
@@ -395,7 +406,9 @@ export class VolcanoPlotComponent implements OnDestroy{
     const extra = this.dataService.getExtraMetaData(primaryID, this.extraMetaDataDBID)
     if (extra) {
       const category = `${extra["Gene Names"]} (${primaryID})`
-      this.dataService.searchSubject.get(this.searchLinkTo)?.next({title: category, primaryIds: [primaryID]})
+      this.dataService.searchSubject.get(this.searchLinkTo)?.next(
+        {title: category, primaryIds: [primaryID], operation: "data-selection"}
+      )
     }
 
     //this.drawGraph()
@@ -421,7 +434,8 @@ export class VolcanoPlotComponent implements OnDestroy{
       const ref = this.modal.open(VolcanoSelectionModalComponent, {size: "lg"})
       ref.componentInstance.data = data
       ref.closed.subscribe((result) => {
-        this.dataService.searchSubject.get(this.searchLinkTo)?.next({title: result.title, primaryIds: data.map(d => d.primaryID)})
+        this.dataService.searchSubject.get(this.searchLinkTo)?.next(
+          {title: result.title, primaryIds: data.map(d => d.primaryID), operation: "data-selection"})
       })
         /*if (result.title !== "") {
           if (!this.settings.categories.includes(result.title)) {
@@ -470,7 +484,66 @@ export class VolcanoPlotComponent implements OnDestroy{
     }
   }
 
+  annotateDataPoint(data: string[]) {
+     if (!this.settings.annotations) {
+      this.settings.annotations = {}
+     }
+    const selectedData = this.df.where(r => data.includes(r[this.primaryIDColumn])).bake()
+    for (const s of selectedData) {
+      if (this.extraMetaDataDBID) {
+        const extra = this.dataService.getExtraMetaData(s[this.primaryIDColumn], this.extraMetaDataDBID)
+        let dataText = s[this.primaryIDColumn]
+        if (extra) {
+          dataText = `${extra["Gene Names"]}<br>${s[this.primaryIDColumn]}`
+        }
+        if (!this.settings.annotations[s[this.primaryIDColumn]]) {
+          this.settings.annotations[s[this.primaryIDColumn]] = {
+            data: {
+              xref: 'x',
+              yref: 'y',
+              x: s[this.fcColumn],
+              y: s[this.pValueColumn],
+              text: "<b>" + dataText + "</b>",
+              showarrow: true,
+              arrowhead: 1,
+              arrowsize: 1,
+              arrowwidth: 1,
+              ax: -20,
+              ay: -20,
+              font: {
+                size: 15,
+                color: "#000000"
+              }
+            },
+            status: true
+          }
+        }
+      }
+    }
+    const annotations: any[] = []
+    for (const s in this.settings.annotations) {
+      annotations.push(this.settings.annotations[s].data)
+    }
+    this.graphLayout.annotations = annotations
+  }
+
+  deleteAnnotation(data: string[]) {
+    if (!this.settings.annotations) {
+      this.settings.annotations = {}
+    }
+    for (const d of data) {
+      delete this.settings.annotations[d]
+    }
+    const annotations: any[] = []
+    for (const s in this.settings.annotations) {
+      annotations.push(this.settings.annotations[s].data)
+    }
+    this.graphLayout.annotations = annotations
+  }
+
   ngOnDestroy() {
     this.subscription?.unsubscribe()
   }
+
+
 }

@@ -88,7 +88,9 @@ export class PlotContainerComponent {
             pids.push(...pid)
           }
         }
-        this.dataService.searchSubject.get(this.data.searchLinkTo)?.next({primaryIds: pids, searchType: data.searchType, title: data.title})
+        this.dataService.searchSubject.get(this.data.searchLinkTo)?.next(
+          {primaryIds: pids, searchType: data.searchType, title: data.title, operation: "data-selection"}
+        )
       }
     })
   }
@@ -126,10 +128,13 @@ export class PlotContainerComponent {
     if (pid) {
       switch (searchType) {
         case 'gene-names':
-          this.dataService.searchSubject.get(this.data.searchLinkTo)?.next({primaryIds: [...pid], type: 'gene-names', title: this.form.value.term})
+          this.dataService.searchSubject.get(this.data.searchLinkTo)?.next(
+            {primaryIds: [...pid], type: 'gene-names', title: this.form.value.term, operation: "data-selection"}
+          )
           break
         case 'primary-id':
-          this.dataService.searchSubject.get(this.data.searchLinkTo)?.next({primaryIds: [...pid], type: 'primary-id', title: ""})
+          this.dataService.searchSubject.get(this.data.searchLinkTo)?.next(
+            {primaryIds: [...pid], type: 'primary-id', title: "", operation: "data-selection"})
           break
       }
     }
