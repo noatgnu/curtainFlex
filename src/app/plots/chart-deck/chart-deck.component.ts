@@ -58,14 +58,18 @@ export class ChartDeckComponent implements OnDestroy{
       if (this.data.searchLinkTo) {
         this.subscription = this.dataService.searchSubject.get(this.data.searchLinkTo)?.subscribe((data: any) => {
           if (data) {
-            if (data.primaryIds.length > 0) {
-              for (const primaryId of data.primaryIds) {
-                if (!(primaryId in this.data.settings.selectedMap)) {
-                  this.data.settings.selectedMap[primaryId] = []
+            switch (data.operation) {
+              case "data-selection":
+                if (data.primaryIds.length > 0) {
+                  for (const primaryId of data.primaryIds) {
+                    if (!(primaryId in this.data.settings.selectedMap)) {
+                      this.data.settings.selectedMap[primaryId] = []
+                    }
+                    this.data.settings.selectedMap[primaryId] = []
+                    this.filterDataForDisplay()
+                  }
                 }
-                this.data.settings.selectedMap[primaryId] = []
-                this.filterDataForDisplay()
-              }
+                break
             }
           }
         })

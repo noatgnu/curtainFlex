@@ -6,6 +6,7 @@ import {FormBuilder} from "@angular/forms";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {VolcanoSelectionModalComponent} from "./volcano-selection-modal/volcano-selection-modal.component";
 import {Subject, Subscription} from "rxjs";
+import {AnnotationModalComponent} from "./annotation-modal/annotation-modal.component";
 
 @Component({
   selector: 'app-volcano-plot',
@@ -16,7 +17,7 @@ export class VolcanoPlotComponent implements OnDestroy{
   @Output() formChanged: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Output() settingsChanged: EventEmitter<any> = new EventEmitter<any>()
 
-
+  hasAnnotation: boolean = false
   graphData: any[] = []
   graphLayout: any = {
     height: 700, width: 700, xaxis: {title: "Log2FC"},
@@ -278,7 +279,17 @@ export class VolcanoPlotComponent implements OnDestroy{
     this.dataService.differentialMap.set(this.plotId, {increase, decrease, notSignificant})
     this.graphData = graphData.reverse()
     this.colorKeys = Object.keys(this.settings.colorMap)
+    const annotations: any[] = []
+    for (const s in this.settings.annotations) {
+      if (this.settings.annotations[s].status) {
+        annotations.push(this.settings.annotations[s].data)
+      }
+    }
+    if (this.settings.annotations) {
+      this.hasAnnotation = Object.keys(this.settings.annotations).length > 0;
+    }
 
+    this.graphLayout.annotations = annotations
     this.form.markAsPristine()
     this.settingsChanged.emit(this.settings)
   }
@@ -494,7 +505,7 @@ export class VolcanoPlotComponent implements OnDestroy{
         const extra = this.dataService.getExtraMetaData(s[this.primaryIDColumn], this.extraMetaDataDBID)
         let dataText = s[this.primaryIDColumn]
         if (extra) {
-          dataText = `${extra["Gene Names"]}<br>${s[this.primaryIDColumn]}`
+          dataText = `${extra["Gene Names"]} [${s[this.primaryIDColumn]}]`
         }
         if (!this.settings.annotations[s[this.primaryIDColumn]]) {
           this.settings.annotations[s[this.primaryIDColumn]] = {
@@ -522,8 +533,11 @@ export class VolcanoPlotComponent implements OnDestroy{
     }
     const annotations: any[] = []
     for (const s in this.settings.annotations) {
-      annotations.push(this.settings.annotations[s].data)
+      if (this.settings.annotations[s].status) {
+        annotations.push(this.settings.annotations[s].data)
+      }
     }
+    this.hasAnnotation = Object.keys(this.settings.annotations).length > 0;
     this.graphLayout.annotations = annotations
   }
 
@@ -536,9 +550,39 @@ export class VolcanoPlotComponent implements OnDestroy{
     }
     const annotations: any[] = []
     for (const s in this.settings.annotations) {
-      annotations.push(this.settings.annotations[s].data)
+      if (this.settings.annotations[s].status) {
+        annotations.push(this.settings.annotations[s].data)
+      }
     }
+    this.hasAnnotation = Object.keys(this.settings.annotations).length > 0;
     this.graphLayout.annotations = annotations
+  }
+
+  openAnnotationModal() {
+    const ref = this.modal.open(AnnotationModalComponent, {size: "xl"})
+    ref.componentInstance.data = this.settings.annotations
+    ref.closed.subscribe((result) => {
+      for (const f of result) {
+        this.settings.annotations[f.value.annotationID].data.showarrow = f.value.showarrow
+        this.settings.annotations[f.value.annotationID].data.arrowhead = f.value.arrowhead
+        this.settings.annotations[f.value.annotationID].data.arrowsize = f.value.arrowsize
+        this.settings.annotations[f.value.annotationID].data.arrowwidth = f.value.arrowwidth
+        this.settings.annotations[f.value.annotationID].data.ax = f.value.ax
+        this.settings.annotations[f.value.annotationID].data.ay = f.value.ay
+        this.settings.annotations[f.value.annotationID].data.font.size = f.value.fontsize
+        this.settings.annotations[f.value.annotationID].data.font.color = f.value.fontcolor
+        this.settings.annotations[f.value.annotationID].data.font.text = f.value.text
+        this.settings.annotations[f.value.annotationID].status = f.value.showannotation
+        const annotations: any[] = []
+        for (const s in this.settings.annotations) {
+          if (this.settings.annotations[s].status) {
+            annotations.push(this.settings.annotations[s].data)
+          }
+        }
+        this.hasAnnotation = Object.keys(this.settings.annotations).length > 0;
+        this.graphLayout.annotations = annotations
+      }
+    })
   }
 
   ngOnDestroy() {

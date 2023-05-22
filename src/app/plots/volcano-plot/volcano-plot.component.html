@@ -58,6 +58,10 @@
         <input type="number" class="form-control" id="dataPointSize" formControlName="pointSize">
       </div>
     </form>
+    <div class="p-2" *ngIf="hasAnnotation">
+      <button class="btn btn-outline-info" (click)="openAnnotationModal()">Annotation Settings</button>
+    </div>
+
   </div>
 
 </div>

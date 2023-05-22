@@ -39,6 +39,7 @@ import { StringdbInteractiveComponent } from './plots/stringdb-interactive/strin
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { ImportedDataManagementModalComponent } from './modal/imported-data-management-modal/imported-data-management-modal.component';
 import { StringDbComponent } from './plots/string-db/string-db.component';
+import { AnnotationModalComponent } from './plots/volcano-plot/annotation-modal/annotation-modal.component';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 @NgModule({
@@ -72,7 +73,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
     UniprotSegmentProgressComponent,
     StringdbInteractiveComponent,
     ImportedDataManagementModalComponent,
-    StringDbComponent
+    StringDbComponent,
+    AnnotationModalComponent
   ],
   imports: [
     BrowserModule,
