@@ -67,11 +67,49 @@ export class AppComponent implements OnInit{
           defaultSettings.sampleVisibility[sample.column] = true
         }
       }
-
+      console.log(result)
       const plotSettings: PlotData = {id: result.plotTitle, filename: result.filename, df: results.data, form: result.form, settings: defaultSettings, plotType: result.plotType, samples: results.samples, extraMetaDataDBID: result.data.extraMetaDataDBID, searchLinkTo: result.searchLinkTo, ptm: result.ptm}
       if (result.searchLinkTo === "") {
         plotSettings.searchLinkTo = result.plotTitle
+      } else {
+        const linkedToPlot = this.dataService.plotLists.find((plot) => plot.id === result.searchLinkTo)
+        console.log(linkedToPlot)
+        if (linkedToPlot) {
+
+          if (plotSettings.plotType === "volcano-plot" && plotSettings.plotType === linkedToPlot.plotType) {
+            const data = plotSettings.df.getSeries(plotSettings.form.primaryID)
+            const dataHas = data.where((value) => value in linkedToPlot.settings.colorMap).bake()
+            plotSettings.settings.colorMap = {}
+            for (const id of dataHas.toArray()) {
+              plotSettings.settings.colorMap[id] = linkedToPlot.settings.colorMap[id]
+            }
+            plotSettings.settings.categories = [...linkedToPlot.settings.categories]
+            plotSettings.settings.volcanoAxis = {...linkedToPlot.settings.volcanoAxis}
+            plotSettings.settings.backgroundColorGrey = linkedToPlot.settings.backgroundColorGrey
+            plotSettings.settings.selectedMap = {}
+            for (const id of dataHas.toArray()) {
+              plotSettings.settings.selectedMap[id] = [...linkedToPlot.settings.selectedMap[id]]
+            }
+            plotSettings.settings.pCutOff = linkedToPlot.settings.pCutOff
+            plotSettings.settings.fcCutOff = linkedToPlot.settings.fcCutOff
+            plotSettings.settings.visible = {}
+            for (const id in linkedToPlot.settings.visible) {
+              plotSettings.settings.visible[id] = linkedToPlot.settings.visible[id]
+            }
+            plotSettings.settings.annotations = {}
+            for (const id in linkedToPlot.settings.annotations) {
+              plotSettings.settings.annotations[id] = linkedToPlot.settings.annotations[id]
+            }
+          } else {
+            plotSettings.settings.categories = [...linkedToPlot.settings.categories]
+            plotSettings.settings.selectedMap = {}
+            for (const id in linkedToPlot.settings.selectedMap) {
+              plotSettings.settings.selectedMap[id] = [...linkedToPlot.settings.selectedMap[id]]
+            }
+          }
+        }
       }
+      console.log(plotSettings)
       this.dataService.searchSubject.set(plotSettings.id, new Subject<any>())
       this.dataService.addPlotToList(plotSettings)
     })

@@ -173,4 +173,8 @@ export class ChartDeckComponent implements OnDestroy{
     }
 
   }
+
+  ptmAnnotationHandler(event: {state: boolean, primaryID: string}) {
+    this.annotationHandler(event.state, event.primaryID)
+  }
 }

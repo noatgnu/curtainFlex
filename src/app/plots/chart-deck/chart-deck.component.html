@@ -13,7 +13,7 @@
   <ng-container [ngSwitch]="plot.plotType">
     <div>
       <app-bar-chart *ngSwitchCase="'bar-chart'" [data]="plot" (toggleAnnotation)="annotationHandler($event, plot.df[plot.form.primaryID])"></app-bar-chart>
-      <app-ptm-summary-chart *ngSwitchCase="'ptm-bar-chart'" [data]="plot"></app-ptm-summary-chart>
+      <app-ptm-summary-chart *ngSwitchCase="'ptm-bar-chart'" [data]="plot" (toggleAnnotation)="ptmAnnotationHandler($event)"></app-ptm-summary-chart>
     </div>
     <hr>
   </ng-container>

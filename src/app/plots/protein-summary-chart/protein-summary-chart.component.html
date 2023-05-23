@@ -1,4 +1,4 @@
-<div class="d-flex">
+<div class="d-flex" [@mouseInOut]="mouseIn ? 'in': 'out'" (mouseenter)="toggleIn()" (mouseleave)="toggleOut()">
   <div class="p-2" *ngIf="extraMetaDataDBID && extraMetaDataDBID !== ''" style="width: 400px">
     <div class="p-2">
       <app-side-card [data]="{hasExtra: hasExtra, metaData: metaData, primaryID: primaryID, relatedVolcano}"></app-side-card>

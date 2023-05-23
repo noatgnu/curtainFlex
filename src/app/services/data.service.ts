@@ -246,9 +246,9 @@ export class DataService {
     const ylog = -Math.log10(pCutoff)
     const groups: string[] = []
     if (ylog > y) {
-      groups.push("P-value < " + pCutoff)
+      groups.push("P-value > " + pCutoff);
     } else {
-      groups.push("P-value >= " + pCutoff)
+      groups.push("P-value <= " + pCutoff)
     }
 
     if (Math.abs(x) > log2FCCutoff) {

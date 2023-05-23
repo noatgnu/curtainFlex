@@ -197,7 +197,18 @@ export class PlotContainerComponent {
         newData.settings.colorMap = data.colorMap
         newData.samples = data.samples
         newData.settings.sampleVisibility = data.sampleVisibility
-        newData.searchLinkTo = data.searchLinkTo
+        if (newData.searchLinkTo !== data.searchLinkTo) {
+          newData.searchLinkTo = data.searchLinkTo
+          const linkedToPlot = this.dataService.plotLists.find((plot) => plot.id === data.searchLinkTo)
+          if (linkedToPlot) {
+            newData.settings.categories = [...linkedToPlot.settings.categories]
+            newData.settings.selectedMap = {}
+            for (const id in linkedToPlot.settings.selectedMap) {
+              newData.settings.selectedMap[id] = [...linkedToPlot.settings.selectedMap[id]]
+            }
+          }
+        }
+
         const inputFile = this.dataService.data.files.get(this.data.filename)
         if (inputFile) {
           if (inputFile.extraMetaDataDBID) {

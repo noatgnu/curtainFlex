@@ -58,7 +58,24 @@
                     </td>
                     <td class="d-flex">
                       <div class="p-2">
-                        <button class="btn btn-sm btn-outline-primary" [ngbTooltip]="'Toggle Visualization'" (click)="toggleVisual(ptm.df[data.form.primaryID])"><i class="bi bi-file-bar-graph"></i></button>
+                        <div ngbDropdown class="d-inline-block">
+                          <button type="button" class="btn btn-outline-primary" ngbDropdownToggle>
+                            Actions
+                          </button>
+                          <div ngbDropdownMenu>
+                            <button ngbDropdownItem (click)="toggleVisual(ptm.df[data.form.primaryID])"><i class="bi bi-file-bar-graph"></i> Toggle Visualization</button>
+                            <div ngbDropdownItem>
+                              <form [formGroup]="annotationFormMap[data.form.primaryID]">
+                                <div class="form-check">
+                                  <input class="form-check-input" type="checkbox" formArrayName="toggleAnnotation">
+                                  <label class="form-check-label">Annotate on volcano plot</label>
+                                </div>
+                              </form>
+                            </div>
+
+                          </div>
+                        </div>
+
                       </div>
                     </td>
                   </tr>

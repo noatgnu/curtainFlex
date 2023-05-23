@@ -1,7 +1,8 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {PlotDataGeneric} from "../../interface/plot-data";
 import {DataService} from "../../services/data.service";
 import {trigger, state, style, animate, transition} from '@angular/animations';
+import {FormBuilder} from "@angular/forms";
 
 @Component({
   selector: 'app-ptm-summary-chart',
@@ -43,6 +44,8 @@ export class PtmSummaryChartComponent {
   extra: any = {}
 
   visualizationState: any = {}
+  annotationFormMap: any = {}
+  @Output() toggleAnnotation: EventEmitter<{ state:boolean, primaryID: string }> = new EventEmitter<{state: boolean, primaryID: string}>()
   @Input() set data(value: PlotDataGeneric) {
     if (value.extraMetaDataDBID && value.df) {
       this.extraMetaDataDBID = value.extraMetaDataDBID
@@ -67,7 +70,15 @@ export class PtmSummaryChartComponent {
 
         this.ptmPlotArray = value.df.toArray().map((row: any) => {
           this.visualizationState[row[value.form.primaryID]] = row[value.form.primaryID] in value.settings.selectedMap
-
+          const form = this.fb.group({
+            toggleAnnotation: [false,],
+          })
+          form.controls.toggleAnnotation.valueChanges.subscribe((data) => {
+            if (data) {
+              this.toggleAnnotation.emit({state: data, primaryID: row[value.form.primaryID]})
+            }
+          })
+          this.annotationFormMap[row[value.form.primaryID]] = form
           const res = JSON.parse(JSON.stringify(result))
           res.df = row
           return res
@@ -80,7 +91,7 @@ export class PtmSummaryChartComponent {
     return this._data
   }
 
-  constructor(private dataService: DataService) {
+  constructor(private dataService: DataService, private fb: FormBuilder) {
 
   }
 
