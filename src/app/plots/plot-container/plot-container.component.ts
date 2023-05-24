@@ -200,11 +200,41 @@ export class PlotContainerComponent {
         if (newData.searchLinkTo !== data.searchLinkTo) {
           newData.searchLinkTo = data.searchLinkTo
           const linkedToPlot = this.dataService.plotLists.find((plot) => plot.id === data.searchLinkTo)
+          console.log(linkedToPlot)
           if (linkedToPlot) {
-            newData.settings.categories = [...linkedToPlot.settings.categories]
+            const cData = newData.df.getSeries(newData.form.primaryID)
+            const dataHas = cData.where((value) => value in linkedToPlot.settings.selectedMap).bake()
             newData.settings.selectedMap = {}
-            for (const id in linkedToPlot.settings.selectedMap) {
+            newData.settings.categories = []
+            for (const id of dataHas.toArray()) {
               newData.settings.selectedMap[id] = [...linkedToPlot.settings.selectedMap[id]]
+              newData.settings.selectedMap[id].forEach((category: string) => {
+                if (!newData.settings.categories.includes(category)) {
+                  newData.settings.categories.push(category)
+                }
+              })
+            }
+            if (newData.plotType === "volcano-plot" && newData.plotType === linkedToPlot.plotType) {
+
+
+              newData.settings.colorMap = {}
+              for (const id of newData.settings.categories) {
+                newData.settings.colorMap[id] = linkedToPlot.settings.colorMap[id]
+              }
+
+              newData.settings.volcanoAxis = {...linkedToPlot.settings.volcanoAxis}
+              newData.settings.backgroundColorGrey = linkedToPlot.settings.backgroundColorGrey
+
+              newData.settings.pCutOff = linkedToPlot.settings.pCutOff
+              newData.settings.fcCutOff = linkedToPlot.settings.fcCutOff
+              newData.settings.visible = {}
+              for (const id of newData.settings.categories) {
+                newData.settings.visible[id] = linkedToPlot.settings.visible[id]
+              }
+              newData.settings.annotations = {}
+              for (const id in linkedToPlot.settings.annotations) {
+                newData.settings.annotations[id] = linkedToPlot.settings.annotations[id]
+              }
             }
           }
         }
