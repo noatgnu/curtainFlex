@@ -75,36 +75,38 @@ export class AppComponent implements OnInit{
         const linkedToPlot = this.dataService.plotLists.find((plot) => plot.id === result.searchLinkTo)
         console.log(linkedToPlot)
         if (linkedToPlot) {
-
+          const data = plotSettings.df.getSeries(plotSettings.form.primaryID)
+          const dataHas = data.where((value) => value in linkedToPlot.settings.selectedMap).bake()
+          plotSettings.settings.selectedMap = {}
+          plotSettings.settings.categories = []
+          for (const id of dataHas.toArray()) {
+            plotSettings.settings.selectedMap[id] = [...linkedToPlot.settings.selectedMap[id]]
+            plotSettings.settings.selectedMap[id].forEach((category: string) => {
+              if (!plotSettings.settings.categories.includes(category)) {
+                plotSettings.settings.categories.push(category)
+              }
+            })
+          }
           if (plotSettings.plotType === "volcano-plot" && plotSettings.plotType === linkedToPlot.plotType) {
-            const data = plotSettings.df.getSeries(plotSettings.form.primaryID)
-            const dataHas = data.where((value) => value in linkedToPlot.settings.colorMap).bake()
+
+
             plotSettings.settings.colorMap = {}
-            for (const id of dataHas.toArray()) {
+            for (const id of plotSettings.settings.categories) {
               plotSettings.settings.colorMap[id] = linkedToPlot.settings.colorMap[id]
             }
-            plotSettings.settings.categories = [...linkedToPlot.settings.categories]
+
             plotSettings.settings.volcanoAxis = {...linkedToPlot.settings.volcanoAxis}
             plotSettings.settings.backgroundColorGrey = linkedToPlot.settings.backgroundColorGrey
-            plotSettings.settings.selectedMap = {}
-            for (const id of dataHas.toArray()) {
-              plotSettings.settings.selectedMap[id] = [...linkedToPlot.settings.selectedMap[id]]
-            }
+
             plotSettings.settings.pCutOff = linkedToPlot.settings.pCutOff
             plotSettings.settings.fcCutOff = linkedToPlot.settings.fcCutOff
             plotSettings.settings.visible = {}
-            for (const id in linkedToPlot.settings.visible) {
+            for (const id of plotSettings.settings.categories) {
               plotSettings.settings.visible[id] = linkedToPlot.settings.visible[id]
             }
             plotSettings.settings.annotations = {}
             for (const id in linkedToPlot.settings.annotations) {
               plotSettings.settings.annotations[id] = linkedToPlot.settings.annotations[id]
-            }
-          } else {
-            plotSettings.settings.categories = [...linkedToPlot.settings.categories]
-            plotSettings.settings.selectedMap = {}
-            for (const id in linkedToPlot.settings.selectedMap) {
-              plotSettings.settings.selectedMap[id] = [...linkedToPlot.settings.selectedMap[id]]
             }
           }
         }

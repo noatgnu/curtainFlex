@@ -77,7 +77,7 @@ export class VolcanoPlotComponent implements OnDestroy{
     this.fcColumn = value.form.foldChange
     this.pValueColumn = value.form.minuslog10pValue
     this.primaryIDColumn = value.form.primaryID
-    this.settings = value.settings
+    this.settings = {...value.settings}
     if (value.extraMetaDataDBID) {
       this.extraMetaDataDBID = value.extraMetaDataDBID
     }
@@ -122,7 +122,6 @@ export class VolcanoPlotComponent implements OnDestroy{
         }
       }
     })
-
     this.drawGraph()
   }
 
@@ -159,7 +158,8 @@ export class VolcanoPlotComponent implements OnDestroy{
     }
     this.graphLayout.title.text = this.form.value.plotTitle
     this.dataService.differentialMap.set(this.plotId, {increase: {}, decrease: {}, notSignificant: {}})
-    const temp = this.prepareCategories()
+
+
     this.layoutMaxMin = {
       xMin: 0, xMax: 0, yMin: 0, yMax: 0
     }
@@ -179,6 +179,7 @@ export class VolcanoPlotComponent implements OnDestroy{
     this.settings.backgroundColorGrey = this.form.value['backgroundColorGrey']
     this.settings.pointSize = this.form.value['pointSize']
 
+    const temp = this.prepareCategories()
 
     this.layoutMaxMin.xMin = this.df.getSeries(this.fcColumn).where(i => !isNaN(i)).min()
     this.layoutMaxMin.xMax =this.df.getSeries(this.fcColumn).where(i => !isNaN(i)).max()
@@ -274,7 +275,6 @@ export class VolcanoPlotComponent implements OnDestroy{
         graphData.push(temp[t])
       }
     }
-
     this.modifyLayout()
     this.dataService.differentialMap.set(this.plotId, {increase, decrease, notSignificant})
     this.graphData = graphData.reverse()
@@ -352,6 +352,10 @@ export class VolcanoPlotComponent implements OnDestroy{
           color: this.settings.colorMap[s],
           size: this.settings.pointSize
         }
+      }
+      if (temp[s].marker.size === undefined) {
+        temp[s].marker.size = this.settings.pointSize
+
       }
     }
     return temp
