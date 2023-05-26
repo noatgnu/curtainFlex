@@ -1,0 +1,17 @@
+<div class="float-start" style="top: 200px; left: 50px; position: fixed; z-index: 1030" *ngIf="dataService.plotLists.length > 0">
+  <div class="card" style="width: 200px">
+    <div class="card-body">
+      <div class="d-flex justify-content-center">
+        <div class="btn-group" role="group">
+          <button class="btn btn-primary" (click)="scrollToTop()"><i class="bi bi-chevron-double-up"></i></button>
+          <button class="btn btn-primary"><i class="bi bi-chevron-compact-up"></i></button>
+          <button class="btn btn-primary"><i class="bi bi-chevron-compact-down"></i></button>
+          <button class="btn btn-primary" (click)="scrollToBottom()"><i class="bi bi-chevron-double-down"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <p>Current Plot ID: {{currentPlot?.id}}</p>
+    </div>
+  </div>
+</div>

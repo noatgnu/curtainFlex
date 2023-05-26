@@ -1,69 +1,83 @@
-<div class="d-flex">
+<div class="d-flex justify-content-center">
   <div class="p-2">
     <plotly-plot (legendClick)="legendClickHandler($event)"  [config]="config" (selected)="selectDataPoints($event)" (plotlyClick)="clickDataPoint($event)" [data]="graphData" [layout]="graphLayout" [updateOnDataChange]="true" [updateOnLayoutChange]="true"></plotly-plot>
   </div>
   <div class="p-2">
-    <h5>Volcano plot colors</h5>
-    <form [formGroup]="form">
-      <div class="form-check">
-        <input type="checkbox" id="backgroundGrey" formControlName="backgroundColorGrey" class="form-check-input">
-        <label for="backgroundGrey" class="form-check-label">Grey background datapoint</label>
-      </div>
-      <div class="form-group p-2" *ngFor="let col of colorKeys">
-        <label>{{col}}</label>
-        <input [(colorPicker)]="settings.colorMap[col]" class="form-control" [style.background-color]="settings.colorMap[col]" (colorPickerChange)="markAsDirty()">
-      </div>
-    </form>
-  </div>
-  <div class="p-2">
-    <form [formGroup]="form" style="width: 400px">
-      <h5>Volcano plot parameters</h5>
-      <div class="form-group">
-        <label for="plotTitle">Plot Title</label>
-        <input type="text" class="form-control" formControlName="plotTitle" id="plotTitle">
-      </div>
-      <div class="form-group">
-        <label for="pCutoff">Significance Cutoff</label>
-        <input type="number" class="form-control" id="pCutoff" formControlName="pCutOff">
-      </div>
-      <div class="form-group">
-        <label for="fcCutoff">log2 Fold Change cutoff</label>
-        <input type="number" class="form-control" id="fcCutoff" formControlName="fcCutOff">
-      </div>
+    <div class="card border-dark">
+      <div class="card-body">
+        <ul ngbNav #nav="ngbNav" [destroyOnHide]="false" class="nav-tabs">
+          <li [ngbNavItem]="1">
+            <button ngbNavLink>Parameters</button>
+            <ng-template ngbNavContent>
+              <form [formGroup]="form">
+                <h5>Volcano plot parameters</h5>
+                <div class="form-group">
+                  <label for="plotTitle">Plot Title</label>
+                  <input type="text" class="form-control" formControlName="plotTitle" id="plotTitle">
+                </div>
+                <div class="form-group">
+                  <label for="pCutoff">Significance Cutoff</label>
+                  <input type="number" class="form-control" id="pCutoff" formControlName="pCutOff">
+                </div>
+                <div class="form-group">
+                  <label for="fcCutoff">log2 Fold Change cutoff</label>
+                  <input type="number" class="form-control" id="fcCutoff" formControlName="fcCutOff">
+                </div>
 
-      <div class="form-check">
-        <input type="checkbox" class="form-check-input" id="manualAxis" formControlName="manualAxis">
-        <label for="manualAxis">Manually specify axis ranges</label>
+                <div class="form-check">
+                  <input type="checkbox" class="form-check-input" id="manualAxis" formControlName="manualAxis">
+                  <label for="manualAxis">Manually specify axis ranges</label>
+                </div>
+                <div class="d-flex" *ngIf="form.value['manualAxis'] !== null && form.value['manualAxis'] !== undefined && form.value['manualAxis'] !== false">
+                  <div class="form-group p-2">
+                    <label for="xMin">X axis minimum</label>
+                    <input type="number" class="form-control" id="xMin" formControlName="minX">
+                  </div>
+                  <div class="form-group p-2">
+                    <label for="xMax">X axis maximum</label>
+                    <input type="number" class="form-control" id="xMax" formControlName="maxX">
+                  </div>
+                  <div class="form-group p-2">
+                    <label for="yMin">Y axis minimum</label>
+                    <input type="number" class="form-control" id="yMin" formControlName="minY">
+                  </div>
+                  <div class="form-group p-2">
+                    <label for="yMax">Y axis maximum</label>
+                    <input type="number" class="form-control" id="yMax" formControlName="maxY">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="dataPointSize">Data point size</label>
+                  <input type="number" class="form-control" id="dataPointSize" formControlName="pointSize">
+                </div>
+              </form>
+              <div class="p-2" *ngIf="hasAnnotation">
+                <button class="btn btn-outline-info" (click)="openAnnotationModal()">Annotation Settings</button>
+              </div>
+            </ng-template>
+          </li>
+          <li [ngbNavItem]="2">
+            <button ngbNavLink>Colors</button>
+            <ng-template ngbNavContent>
+              <h5>Volcano plot colors</h5>
+              <form [formGroup]="form">
+                <div class="form-check">
+                  <input type="checkbox" id="backgroundGrey" formControlName="backgroundColorGrey" class="form-check-input">
+                  <label for="backgroundGrey" class="form-check-label">Grey background datapoint</label>
+                </div>
+                <div class="form-group p-2" *ngFor="let col of colorKeys">
+                  <label>{{col}}</label>
+                  <input [(colorPicker)]="settings.colorMap[col]" class="form-control" [style.background-color]="settings.colorMap[col]" (colorPickerChange)="markAsDirty()">
+                </div>
+              </form>
+            </ng-template>
+          </li>
+        </ul>
+        <div [ngbNavOutlet]="nav"></div>
       </div>
-      <div class="d-flex" *ngIf="form.value['manualAxis'] !== null && form.value['manualAxis'] !== undefined && form.value['manualAxis'] !== false">
-        <div class="form-group p-2">
-          <label for="xMin">X axis minimum</label>
-          <input type="number" class="form-control" id="xMin" formControlName="minX">
-        </div>
-        <div class="form-group p-2">
-          <label for="xMax">X axis maximum</label>
-          <input type="number" class="form-control" id="xMax" formControlName="maxX">
-        </div>
-        <div class="form-group p-2">
-          <label for="yMin">Y axis minimum</label>
-          <input type="number" class="form-control" id="yMin" formControlName="minY">
-        </div>
-        <div class="form-group p-2">
-          <label for="yMax">Y axis maximum</label>
-          <input type="number" class="form-control" id="yMax" formControlName="maxY">
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="dataPointSize">Data point size</label>
-        <input type="number" class="form-control" id="dataPointSize" formControlName="pointSize">
-      </div>
-    </form>
-    <div class="p-2" *ngIf="hasAnnotation">
-      <button class="btn btn-outline-info" (click)="openAnnotationModal()">Annotation Settings</button>
     </div>
 
   </div>
-
 </div>
 <div class="d-flex flex-row-reverse" *ngIf="form.dirty">
   <button class="btn btn-warning" (click)="drawGraph()">Update</button>

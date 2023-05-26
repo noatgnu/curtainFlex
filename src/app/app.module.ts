@@ -40,6 +40,7 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { ImportedDataManagementModalComponent } from './modal/imported-data-management-modal/imported-data-management-modal.component';
 import { StringDbComponent } from './plots/string-db/string-db.component';
 import { AnnotationModalComponent } from './plots/volcano-plot/annotation-modal/annotation-modal.component';
+import { SideFloatControlComponent } from './side-float-control/side-float-control.component';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 @NgModule({
@@ -74,7 +75,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
     StringdbInteractiveComponent,
     ImportedDataManagementModalComponent,
     StringDbComponent,
-    AnnotationModalComponent
+    AnnotationModalComponent,
+    SideFloatControlComponent
   ],
   imports: [
     BrowserModule,

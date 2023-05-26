@@ -1,3 +1,6 @@
+
 <ng-container *ngFor="let plot of dataService.plotLists; let ind = index">
-  <app-plot-container class="p-2" [data]="plot" [position]="ind"></app-plot-container>
+  <div [id]="plot.id" class="p-2">
+    <app-plot-container [data]="plot" [position]="ind"></app-plot-container>
+  </div>
 </ng-container>

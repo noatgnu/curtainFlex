@@ -3,18 +3,17 @@ import {DataFrame, fromCSV, IDataFrame, Series} from "data-forge";
 import {Subject} from "rxjs";
 import {PlotData} from "../interface/plot-data";
 import {InputFile} from "../classes/input-file";
-import {replacer} from "curtain-web-api";
 import {
   SelectExtraMetadataModalComponent
 } from "../modal/select-extra-metadata-modal/select-extra-metadata-modal.component";
 import {UniprotService} from "./uniprot.service";
-import {addWarning} from "@angular-devkit/build-angular/src/utils/webpack-diagnostics";
 import {AccountsService} from "./accounts.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
+
   plotsSubject: Subject<any> = new Subject<any>()
   data: {files: Map<string, InputFile>, filenameList: string[]} = {files: new Map<string, InputFile>(), filenameList: []}
   plotLists: PlotData[] = []

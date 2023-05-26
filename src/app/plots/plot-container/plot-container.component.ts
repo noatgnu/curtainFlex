@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, ElementRef, HostListener, Input} from '@angular/core';
 import {PlotData} from "../../interface/plot-data";
 import {DataFrame} from "data-forge";
 import {DataService} from "../../services/data.service";
@@ -8,6 +8,7 @@ import {FormBuilder} from "@angular/forms";
 import {debounceTime, distinctUntilChanged, map, Observable, OperatorFunction} from "rxjs";
 import {PlotSettingsModalComponent} from "../../modal/plot-settings-modal/plot-settings-modal.component";
 import {PdbViewerModalComponent} from "../../modal/pdb-viewer-modal/pdb-viewer-modal.component";
+import {ScrollService} from "../../services/scroll.service";
 
 @Component({
   selector: 'app-plot-container',
@@ -15,6 +16,7 @@ import {PdbViewerModalComponent} from "../../modal/pdb-viewer-modal/pdb-viewer-m
   styleUrls: ['./plot-container.component.less']
 })
 export class PlotContainerComponent {
+
   _data: PlotData = {
     id: "",
     filename: "",
@@ -69,7 +71,7 @@ export class PlotContainerComponent {
   }
 
 
-  constructor(public dataService: DataService, private modal: NgbModal, private fb: FormBuilder) {
+  constructor(private scrollService: ScrollService, private elem: ElementRef, public dataService: DataService, private modal: NgbModal, private fb: FormBuilder) {
 
   }
 
@@ -255,5 +257,15 @@ export class PlotContainerComponent {
     })
   }
 
+  @HostListener('window:scroll', ['$event'])
+  onViewPortScroll() {
+    const windowHeight = window.innerHeight;
+    const boundary = this.elem.nativeElement.getBoundingClientRect();
+    if (boundary.top >= 0 && boundary.top <= (windowHeight - windowHeight/4)) {
+      setTimeout(() => {
+        this.scrollService.currentPlotSubject.next(this.data.id)
+      }, 300)
 
+    }
+  }
 }
