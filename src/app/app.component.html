@@ -56,7 +56,7 @@
   </div>
 </nav>
 
-<app-side-float-control></app-side-float-control>
+<app-side-float-control *ngIf="dataService.plotLists.length > 0"></app-side-float-control>
 
 <div class="container" *ngIf="dataService.currentSession.id !== ''">
   <div class="card mt-2">

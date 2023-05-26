@@ -19,7 +19,12 @@ export class StringDbComponent {
   private _data: any = {}
 
   @Input() set data(value: any) {
-
+    this._data = value
+    this.ids = value["STRING"].split(';').filter((i: string) => i !== "")
+    this.organism = value["Organism (ID)"]
+    this.selectedGenes = value["Gene Names"].split(';')
+    this.selected = this.selectedGenes[0]
+    this.getString().then()
   }
   get data(): any {
     return this._data
@@ -29,7 +34,7 @@ export class StringDbComponent {
 
   }
 
-  getString() {
+  async getString() {
     if (this.requiredScore > 1000) {
       this.requiredScore = 1000
     }
@@ -49,7 +54,7 @@ export class StringDbComponent {
           'caller_identity': 'dundee.ac.uk',
           'network_type': this.networkType,
           'required_score': this.requiredScore},
-        [],
+        this.selectedGenes,
         increased,
         decreased,
         allGenes

@@ -19,6 +19,7 @@ export class SideCardComponent {
   primaryId: string = ""
   proteinName: string = ""
   relatedVolcano: any = {}
+
   @Input() set data(value: any) {
     this.hasExtra = value["hasExtra"]
     this.primaryId = value["primaryID"]

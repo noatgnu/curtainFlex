@@ -19,7 +19,7 @@ export class UniprotService {
   async getUniprot(accs: string[], accMap: Map<string, string[]>) {
     this.segments = []
     this.segmentCount = Math.ceil(accs.length/10000)
-    const parser = new Parser(5, "accession,id,gene_names,protein_name,organism_name,organism_id,length,xref_refseq,ft_var_seq,cc_alternative_products,ft_domain,xref_string")
+    const parser = new Parser(5, "accession,id,gene_names,protein_name,organism_name,organism_id,length,xref_refseq,ft_var_seq,cc_alternative_products,ft_domain,xref_string,organism_id")
     const res = await parser.parse((accs))
     const dataMap: Map<string, string> = new Map<string, string>()
     const db: Map<string, any> = new Map<string, any>()

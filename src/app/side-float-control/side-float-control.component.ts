@@ -28,4 +28,22 @@ export class SideFloatControlComponent {
   scrollToBottom() {
     this.scrollService.scrollToID(this.dataService.plotLists[this.dataService.plotLists.length - 1].id)
   }
+
+  scrollToNext() {
+    if (this.currentPlot) {
+      const index = this.dataService.plotLists.indexOf(this.currentPlot)
+      if (index >= 0 && index < this.dataService.plotLists.length - 1) {
+        this.scrollService.scrollToID(this.dataService.plotLists[index + 1].id)
+      }
+    }
+  }
+
+  scrollToPrevious() {
+    if (this.currentPlot) {
+      const index = this.dataService.plotLists.indexOf(this.currentPlot)
+      if (index > 0 && index < this.dataService.plotLists.length) {
+        this.scrollService.scrollToID(this.dataService.plotLists[index - 1].id)
+      }
+    }
+  }
 }

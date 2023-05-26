@@ -15,10 +15,23 @@
         </div>
       </div>
     </div>
-
   </div>
   <div class="p-2 flex-fill">
-    <app-bar [data]="data"></app-bar>
+    <ul ngbNav #nav="ngbNav" class="nav-tabs">
+      <li [ngbNavItem]="'intensity'">
+        <button ngbNavLink>Intensity Data</button>
+        <ng-template ngbNavContent>
+          <app-bar [data]="data"></app-bar>
+        </ng-template>
+      </li>
+      <li [ngbNavItem]="'STRING'">
+        <button ngbNavLink>STRING</button>
+        <ng-template ngbNavContent>
+          <app-string-db [data]="metaData"></app-string-db>
+        </ng-template>
+      </li>
+    </ul>
+    <div [ngbNavOutlet]="nav"></div>
   </div>
 </div>
 
