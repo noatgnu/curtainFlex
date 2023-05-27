@@ -5,7 +5,7 @@
   <div class="col-9">
     <div class="card border-dark">
       <div class="card-body">
-        <ul ngbNav #nav="ngbNav" class="nav-tabs">
+        <ul ngbNav #nav="ngbNav" class="nav-tabs" [destroyOnHide]="false">
           <li ngbNavItem="table">
             <button ngbNavLink>Intensity Data</button>
             <ng-template ngbNavContent>
@@ -87,6 +87,18 @@
                 </ng-container>
                 </tbody>
               </table>
+            </ng-template>
+          </li>
+          <li ngbNavItem="STRING" [destroyOnHide]="true">
+            <button ngbNavLink>STRING</button>
+            <ng-template ngbNavContent>
+              <app-string-db [data]="{metaData, searchLinkTo: data.searchLinkTo}"></app-string-db>
+            </ng-template>
+          </li>
+          <li ngbNavItem="ProteomicsDB">
+            <button ngbNavLink>Proteomics DB</button>
+            <ng-template ngbNavContent>
+              <app-proteomics-db [uniprotID]="metaData['Entry']"></app-proteomics-db>
             </ng-template>
           </li>
           <li ngbNavItem="ptmViewer">

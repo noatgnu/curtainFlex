@@ -1,0 +1,15 @@
+<form [formGroup]="form">
+  <div class="form-group">
+    <label for="tissueType">Select Tissue or Cell Line</label>
+    <select style="max-width: 200px" id="tissueType" class="form-control" formControlName="selected">
+      <option value="tissue">
+        Tissue
+      </option>
+      <option value="cell line">
+        Cell line
+      </option>
+    </select>
+  </div>
+</form>
+<plotly-plot [config]="config" [data]="graphData" [layout]="graphLayout" [updateOnLayoutChange]="true" [updateOnDataChange]="true"></plotly-plot>
+

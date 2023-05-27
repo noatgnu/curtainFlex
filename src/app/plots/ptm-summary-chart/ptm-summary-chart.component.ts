@@ -45,6 +45,7 @@ export class PtmSummaryChartComponent {
 
   visualizationState: any = {}
   annotationFormMap: any = {}
+
   @Output() toggleAnnotation: EventEmitter<{ state:boolean, primaryID: string }> = new EventEmitter<{state: boolean, primaryID: string}>()
   @Input() set data(value: PlotDataGeneric) {
     if (value.extraMetaDataDBID && value.df) {

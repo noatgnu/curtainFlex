@@ -43,6 +43,7 @@ import { AnnotationModalComponent } from './plots/volcano-plot/annotation-modal/
 import { SideFloatControlComponent } from './side-float-control/side-float-control.component';
 import { AboutUsModalComponent } from './modal/about-us-modal/about-us-modal.component';
 import {NgOptimizedImage} from "@angular/common";
+import { ProteomicsDbComponent } from './plots/proteomics-db/proteomics-db.component';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 @NgModule({
@@ -79,7 +80,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
     StringDbComponent,
     AnnotationModalComponent,
     SideFloatControlComponent,
-    AboutUsModalComponent
+    AboutUsModalComponent,
+    ProteomicsDbComponent
   ],
     imports: [
         BrowserModule,

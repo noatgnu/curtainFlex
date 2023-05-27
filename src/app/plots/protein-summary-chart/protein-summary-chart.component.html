@@ -30,6 +30,12 @@
           <app-string-db [data]="{metaData, searchLinkTo: data.searchLinkTo}"></app-string-db>
         </ng-template>
       </li>
+      <li ngbNavItem="ProteomicsDB">
+        <button ngbNavLink>Proteomics DB</button>
+        <ng-template ngbNavContent>
+          <app-proteomics-db [uniprotID]="metaData['Entry']"></app-proteomics-db>
+        </ng-template>
+      </li>
     </ul>
     <div [ngbNavOutlet]="nav"></div>
   </div>
