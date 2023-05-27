@@ -47,7 +47,6 @@ export class ProteomicsDbComponent {
     }
   }
   config: any = {
-    //modeBarButtonsToRemove: ["toImage"]
     toImageButtonOptions: {
       format: 'svg',
       filename: this.graphLayout.title.text,
@@ -135,6 +134,15 @@ export class ProteomicsDbComponent {
           this.graphData = graphData
           this.graphLayout = graphLayout
         }
+      }
+    }
+    this.config = {
+      toImageButtonOptions: {
+        format: 'svg',
+        filename: this.graphLayout.title.text,
+        height: this.graphLayout.height,
+        width: this.graphLayout.width,
+        scale: 1
       }
     }
   }
