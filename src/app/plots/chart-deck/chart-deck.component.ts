@@ -86,6 +86,7 @@ export class ChartDeckComponent implements OnDestroy{
         settings: this._data.settings,
         samples: this._data.samples,
         plotType: this._data.plotType,
+        searchLinkTo: this._data.searchLinkTo,
         extraMetaDataDBID: this._data.extraMetaDataDBID
       }
       if (this._data.ptm !== true) {

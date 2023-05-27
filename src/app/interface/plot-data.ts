@@ -19,5 +19,6 @@ export interface PlotDataGeneric {
   settings: any;
   samples: any[];
   plotType: string;
+  searchLinkTo?: string;
   extraMetaDataDBID?: string;
 }

@@ -21,7 +21,7 @@ export class DataService {
   extraMetaData: Map<string, any> = new Map<string, any>()
   searchSubject: Map<string, Subject<any>> = new Map<string, Subject<any>>()
   showUniprotProgress: boolean = false
-  differentialMap: Map<string, {increase: {[key: string]: {fc: number, p: number}}, decrease: {[key: string]: {fc: number, p: number}}, notSignificant: {[key: string]: {fc: number, p: number}}}> = new Map<string, any>()
+  differentialMap: Map<string, {increase: {[key: string]: {fc: number, p: number, geneNames: string[]}}, decrease: {[key: string]: {fc: number, p: number, geneNames: string[]}}, notSignificant: {[key: string]: {fc: number, p: number, geneNames: string[]}}}> = new Map<string, any>()
   plotUpdateSubjectMap: Map<string, Subject<any>> = new Map<string, Subject<any>>()
 
   currentSession: any = {

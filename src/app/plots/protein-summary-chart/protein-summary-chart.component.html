@@ -1,5 +1,5 @@
-<div class="d-flex" [@mouseInOut]="mouseIn ? 'in': 'out'" (mouseenter)="toggleIn()" (mouseleave)="toggleOut()">
-  <div class="p-2" *ngIf="extraMetaDataDBID && extraMetaDataDBID !== ''" style="width: 400px">
+<div class="row" [@mouseInOut]="mouseIn ? 'in': 'out'" (mouseenter)="toggleIn()" (mouseleave)="toggleOut()">
+  <div class="col-3" *ngIf="extraMetaDataDBID && extraMetaDataDBID !== ''">
     <div class="p-2">
       <app-side-card [data]="{hasExtra: hasExtra, metaData: metaData, primaryID: primaryID, relatedVolcano}"></app-side-card>
     </div>
@@ -16,18 +16,18 @@
       </div>
     </div>
   </div>
-  <div class="p-2 flex-fill">
-    <ul ngbNav #nav="ngbNav" class="nav-tabs">
+  <div class="col-9">
+    <ul ngbNav #nav="ngbNav" class="nav-tabs" [destroyOnHide]="false">
       <li [ngbNavItem]="'intensity'">
         <button ngbNavLink>Intensity Data</button>
         <ng-template ngbNavContent>
           <app-bar [data]="data"></app-bar>
         </ng-template>
       </li>
-      <li [ngbNavItem]="'STRING'">
+      <li [ngbNavItem]="'STRING'" [destroyOnHide]="true">
         <button ngbNavLink>STRING</button>
         <ng-template ngbNavContent>
-          <app-string-db [data]="metaData"></app-string-db>
+          <app-string-db [data]="{metaData, searchLinkTo: data.searchLinkTo}"></app-string-db>
         </ng-template>
       </li>
     </ul>

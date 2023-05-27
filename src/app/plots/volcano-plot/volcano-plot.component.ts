@@ -164,9 +164,9 @@ export class VolcanoPlotComponent implements OnDestroy{
       xMin: 0, xMax: 0, yMin: 0, yMax: 0
     }
     const ylog = -Math.log10(this.settings.pCutOff)
-    const increase: {[key: string]: {fc: number, p: number}} = {}
-    const decrease: {[key: string]: {fc: number, p: number}} = {}
-    const notSignificant: {[key: string]: {fc: number, p: number}} = {}
+    const increase: {[key: string]: {fc: number, p: number, geneNames: string[]}} = {}
+    const decrease: {[key: string]: {fc: number, p: number, geneNames: string[]}} = {}
+    const notSignificant: {[key: string]: {fc: number, p: number, geneNames: string[]}} = {}
 
     this.settings.volcanoAxis.minX = this.form.value['minX']
     this.settings.volcanoAxis.maxX = this.form.value['maxX']
@@ -206,22 +206,24 @@ export class VolcanoPlotComponent implements OnDestroy{
       const pValue = row[this.pValueColumn]
       const primaryID = row[this.primaryIDColumn]
       let dataText = primaryID
+      let geneNames: string[] = []
       if (this.extraMetaDataDBID) {
         const extra = this.dataService.getExtraMetaData(primaryID, this.extraMetaDataDBID)
         if (extra) {
           dataText = `${extra["Gene Names"]}<br>${primaryID}`
+          geneNames = extra["Gene Names"].split(";")
         }
       }
 
 
       if (ylog > pValue && Math.abs(fc) > this.settings.fcCutOff) {
         if (fc > 0) {
-          increase[primaryID] = {fc, p: pValue}
+          increase[primaryID] = {fc, p: pValue, geneNames}
         } else {
-          decrease[primaryID] = {fc, p: pValue}
+          decrease[primaryID] = {fc, p: pValue, geneNames}
         }
       } else {
-        notSignificant[primaryID] = {fc, p: pValue}
+        notSignificant[primaryID] = {fc, p: pValue, geneNames}
       }
 
       if (primaryID in this.settings.selectedMap) {

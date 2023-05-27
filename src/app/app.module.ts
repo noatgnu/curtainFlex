@@ -41,6 +41,8 @@ import { ImportedDataManagementModalComponent } from './modal/imported-data-mana
 import { StringDbComponent } from './plots/string-db/string-db.component';
 import { AnnotationModalComponent } from './plots/volcano-plot/annotation-modal/annotation-modal.component';
 import { SideFloatControlComponent } from './side-float-control/side-float-control.component';
+import { AboutUsModalComponent } from './modal/about-us-modal/about-us-modal.component';
+import {NgOptimizedImage} from "@angular/common";
 
 PlotlyModule.plotlyjs = PlotlyJS;
 @NgModule({
@@ -76,19 +78,21 @@ PlotlyModule.plotlyjs = PlotlyJS;
     ImportedDataManagementModalComponent,
     StringDbComponent,
     AnnotationModalComponent,
-    SideFloatControlComponent
+    SideFloatControlComponent,
+    AboutUsModalComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    NgbModule,
-    PlotlyModule,
-    FormsModule,
-    ReactiveFormsModule,
-    ColorPickerModule,
-    HttpClientModule,
-    BrowserAnimationsModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        NgbModule,
+        PlotlyModule,
+        FormsModule,
+        ReactiveFormsModule,
+        ColorPickerModule,
+        HttpClientModule,
+        BrowserAnimationsModule,
+        NgOptimizedImage
+    ],
   providers: [
     NgbActiveModal
   ],

@@ -265,7 +265,11 @@ export class PlotContainerComponent {
       setTimeout(() => {
         this.scrollService.currentPlotSubject.next(this.data.id)
       }, 300)
-
+    } else if (boundary.bottom > 0 && boundary.bottom <= (windowHeight - windowHeight/4)) {
+      setTimeout(() => {
+        this.scrollService.currentPlotSubject.next(this.data.id)
+      }, 300)
     }
+
   }
 }

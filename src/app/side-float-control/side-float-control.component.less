@@ -1,0 +1,22 @@
+svg {
+  transform-origin: center center;
+  transform-box: fill-box;
+}
+
+.animation-start {
+  animation:
+    x 2s linear infinite alternate,
+    y 2s infinite cubic-bezier(0,500,1,500);
+}
+
+@keyframes x {
+  to {
+    left: random(0, 100) + 'px';
+  }
+}
+
+@keyframes y {
+  to {
+    top: random(0, 100) + 'px';
+  }
+}
