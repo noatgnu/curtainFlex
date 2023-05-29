@@ -15,12 +15,14 @@
     <div class="form-group" *ngIf="form.value['enableLink']===false">
       <label for="column">Column with accession ids</label>
       <select id="column" formControlName="column" class="form-control">
+        <option [value]="''"></option>
         <option *ngFor="let c of data.getColumnNames()" [value]="c">{{c}}</option>
       </select>
     </div>
     <div class="form-group" *ngIf="form.value['enableLink']===false">
       <label for="primaryID">Column with unique primary id to be used as index</label>
       <select id="PrimaryID" formControlName="primaryID" class="form-control">
+        <option [value]="''"></option>
         <option *ngFor="let c of data.getColumnNames()" [value]="c">{{c}}</option>
       </select>
     </div>
@@ -46,30 +48,35 @@
       <div class="form-group">
         <label for="proteinID">Protein ID</label>
         <select formControlName="proteinID" class="form-control" id="proteinID">
+          <option [value]="''"></option>
           <option *ngFor="let col of data.getColumnNames()" [value]="col">{{col}}</option>
         </select>
       </div>
       <div class="form-group">
         <label for="peptideSequence">Peptide Sequence</label>
         <select formControlName="peptideSequence" class="form-control" id="peptideSequence">
+          <option [value]="''"></option>
           <option *ngFor="let col of data.getColumnNames()" [value]="col">{{col}}</option>
         </select>
       </div>
       <div class="form-group">
         <label for="positionInPeptide">Position in Peptide</label>
         <select formControlName="positionInPeptide" class="form-control" id="positionInPeptide">
+          <option [value]="''"></option>
           <option *ngFor="let col of data.getColumnNames()" [value]="col">{{col}}</option>
         </select>
       </div>
       <div class="form-group">
         <label for="positionInProtein">Position in Protein</label>
         <select formControlName="positionInProtein" class="form-control" id="positionInProtein">
+          <option [value]="''"></option>
           <option *ngFor="let col of data.getColumnNames()" [value]="col">{{col}}</option>
         </select>
       </div>
       <div class="form-group">
         <label for="LocalizationProbability">Localization Probability</label>
         <select formControlName="LocalizationProbability" class="form-control" id="LocalizationProbability">
+          <option [value]="''"></option>
           <option *ngFor="let col of data.getColumnNames()" [value]="col">{{col}}</option>
         </select>
       </div>

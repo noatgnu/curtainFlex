@@ -41,12 +41,14 @@
       <div class="form-group">
         <label for="comparisonCol">Comparison Column</label>
         <select formControlName="comparisonCol" class="form-control" id="comparisonCol">
+          <option [value]="''"></option>
           <option *ngFor="let col of selectedDF.getColumnNames()" [value]="col">{{col}}</option>
         </select>
       </div>
       <div class="form-group">
         <label for="comparison">Comparison</label>
         <select formControlName="comparison" class="form-control" id="comparison">
+          <option [value]="''"></option>
           <option *ngFor="let comp of comparisons" [value]="comp">{{comp}}</option>
         </select>
       </div>
