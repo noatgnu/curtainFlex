@@ -44,6 +44,13 @@
             </span>
           </button>
         </div>
+        <div class="p-2">
+          <button class="btn btn-primary" (click)="openDataSelectionRemovalModal()" [ngbTooltip]="'Data selection editor'">
+            <span>
+              <i class="bi-book-half"></i> Data selection editor
+            </span>
+          </button>
+        </div>
       </div>
       <ng-container *ngIf="data.plotType !== ''">
         <ng-container [ngSwitch]="data.plotType">

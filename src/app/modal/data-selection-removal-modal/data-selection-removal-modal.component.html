@@ -1,0 +1,55 @@
+<div class="modal-header">
+  <h5 class="modal-title">
+    Data Selection Editor
+  </h5>
+</div>
+<div class="modal-body">
+  <div class="card bg-warning">
+    <div class="card-body">
+      <p class="card-text">
+        Changes made to the data selection will be applied to the following charts and plots:
+      </p>
+      <ul>
+        <li *ngFor="let p of linkedPlots">
+          {{p.id}} ({{p.plotType}})
+        </li>
+      </ul>
+    </div>
+  </div>
+  <table class="table table-borderless">
+    <thead>
+    <tr>
+      <th scope="col">
+        Current Title
+      </th>
+      <th>
+        New Title
+      </th>
+      <th scope="col">
+        Number of selected entries
+      </th>
+      <th scope="col">
+
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let c of mainPlot?.settings.categories">
+      <td>
+        {{c}}
+      </td>
+      <td>
+        <input type="text" class="form-control">
+      </td>
+      <td></td>
+      <td>
+        <button class="btn btn-danger btn-sm">
+          <i class="bi bi-trash"></i>
+        </button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+
+</div>

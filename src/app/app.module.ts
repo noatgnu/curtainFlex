@@ -44,6 +44,7 @@ import { SideFloatControlComponent } from './side-float-control/side-float-contr
 import { AboutUsModalComponent } from './modal/about-us-modal/about-us-modal.component';
 import {NgOptimizedImage} from "@angular/common";
 import { ProteomicsDbComponent } from './plots/proteomics-db/proteomics-db.component';
+import { DataSelectionRemovalModalComponent } from './modal/data-selection-removal-modal/data-selection-removal-modal.component';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 @NgModule({
@@ -81,7 +82,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
     AnnotationModalComponent,
     SideFloatControlComponent,
     AboutUsModalComponent,
-    ProteomicsDbComponent
+    ProteomicsDbComponent,
+    DataSelectionRemovalModalComponent
   ],
     imports: [
         BrowserModule,

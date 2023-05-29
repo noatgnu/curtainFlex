@@ -129,6 +129,8 @@ export class VolcanoPlotComponent implements OnDestroy{
           case "remove-annotation":
             this.deleteAnnotation(value.primaryIds)
             break
+          case "remove-data-selection":
+            break
         }
       }
     })

@@ -9,6 +9,9 @@ import {debounceTime, distinctUntilChanged, map, Observable, OperatorFunction} f
 import {PlotSettingsModalComponent} from "../../modal/plot-settings-modal/plot-settings-modal.component";
 import {PdbViewerModalComponent} from "../../modal/pdb-viewer-modal/pdb-viewer-modal.component";
 import {ScrollService} from "../../services/scroll.service";
+import {
+  DataSelectionRemovalModalComponent
+} from "../../modal/data-selection-removal-modal/data-selection-removal-modal.component";
 
 @Component({
   selector: 'app-plot-container',
@@ -271,5 +274,13 @@ export class PlotContainerComponent {
       }, 300)
     }
 
+  }
+
+  openDataSelectionRemovalModal() {
+    const ref = this.modal.open(DataSelectionRemovalModalComponent, {size: "lg", scrollable: true, backdrop: 'static'})
+    ref.componentInstance.data = this.data.searchLinkTo
+    ref.closed.subscribe((data: any) => {
+
+    })
   }
 }

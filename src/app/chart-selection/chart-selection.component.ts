@@ -63,7 +63,7 @@ export class ChartSelectionComponent implements AfterViewInit{
 
   initialForm = this.fb.group({
     plotTitle: [crypto.randomUUID(),],
-    plotType: [null,],
+    plotType: ['volcano-plot',],
     filename: ['',],
     searchLinkTo: ['',],
     ptm: [false,],
@@ -80,11 +80,19 @@ export class ChartSelectionComponent implements AfterViewInit{
       if (value) {
         this.selectedFile = value
         this.selectedDF = this.data.files.get(value)?.df || new DataFrame()
+        console.log(this.selectedDF)
+      }
+    })
+    this.initialForm.controls['ptm'].valueChanges.subscribe(value => {
+      if (value) {
+        console.log(this.selectedPlotType)
+        this.initialForm.controls['plotType'].setValue('volcano-plot')
       }
     })
     this.initialForm.controls['plotType'].valueChanges.subscribe((value:any) => {
       if (value) {
         this.selectedPlotType = value
+        console.log(this.selectedPlotType)
         changeDetectorRef.detectChanges()
       }
     })
@@ -92,6 +100,7 @@ export class ChartSelectionComponent implements AfterViewInit{
       if (value !== null && value !== "") {
         this.comparisons = this.selectedDF.getSeries(value).distinct().bake().toArray()
         this.initialForm.controls["comparison"].setValue(this.comparisons[0] || "")
+        changeDetectorRef.detectChanges()
       }
     })
   }
