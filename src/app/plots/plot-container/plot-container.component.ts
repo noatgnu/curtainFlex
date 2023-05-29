@@ -261,7 +261,7 @@ export class PlotContainerComponent {
   onViewPortScroll() {
     const windowHeight = window.innerHeight;
     const boundary = this.elem.nativeElement.getBoundingClientRect();
-    if (boundary.top >= 0 && boundary.top <= (windowHeight - windowHeight/4)) {
+    if (boundary.top >= 0 && boundary.top <= (windowHeight - windowHeight/3)) {
       setTimeout(() => {
         this.scrollService.currentPlotSubject.next(this.data.id)
       }, 300)

@@ -163,6 +163,7 @@ export class VolcanoPlotComponent implements OnDestroy{
     xMin: 0, xMax: 0, yMin: 0, yMax: 0
   }
   drawGraph() {
+    this.currentPosition = 0
     if (!this.settings.visible) {
       this.settings.visible = {}
     }

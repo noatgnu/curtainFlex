@@ -218,7 +218,31 @@ export class HomeComponent {
     } else {
       jsonData.extraMetaData["processed.txt"].form.column = data.data.differentialForm._primaryIDs
       jsonData.extraMetaData["processed.txt"].form.primaryID = data.data.differentialForm._primaryIDs
-
+      const annotations: any = {}
+      for (const a in data.data.annotatedData) {
+        const match = /\(([^)]*)\)[^(]*$/.exec(a)
+        if (match) {
+          annotations[match[1]] = {data:
+              {
+                xref: 'x',
+                yref: 'y',
+                x: data.data.annotatedData[a].x,
+                y: data.data.annotatedData[a].y,
+                text: data.data.annotatedData[a].text,
+                showarrow: true,
+                arrowhead: 1,
+                arrowsize: data.data.annotatedData[a].arrowsize,
+                arrowwidth: 1,
+                ax: -20,
+                ay: -20,
+                font: {
+                  size: data.data.annotatedData[a].font.size,
+                  color: "#000000"
+                }
+              },
+            status: true}
+        }
+      }
       const samples = data.data.rawForm._samples.map((sample: string) => {
         const split = sample.split('.')
         if (split.length > 1) {
@@ -256,7 +280,7 @@ export class HomeComponent {
         samples: [],
         searchLinkTo: volcanoPlotID,
         settings: {
-          annotations: {},
+          annotations: annotations,
           backgroundColorGrey: false,
           categories: data.data.selectionsName.slice(),
           colorMap: colorMap,
