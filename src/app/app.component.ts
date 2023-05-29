@@ -56,24 +56,37 @@ export class AppComponent implements OnInit{
   }
 
   openChartSelection() {
-    const modalRef = this.modal.open(ChartSelectionComponent);
+    const modalRef = this.modal.open(ChartSelectionComponent, {scrollable: true});
     modalRef.componentInstance.data = this.dataService.data
     modalRef.componentInstance.plotList = this.dataService.plotLists
     modalRef.closed.subscribe((result) => {
-      const results = this.dataService.processForm(result.plotTitle, result.data.df, result.form, result.plotType)
+      let df = result.data.df
+      const results = this.dataService.processForm(result.plotTitle, df, result.form, result.plotType)
+      results.form.comparisonCol = result.comparisonCol
+      results.form.comparison = result.comparison
       const defaultSettings: any = this.dataService.getDefaultsPlotOptions(result.plotType)
       if ("sampleVisibility" in defaultSettings) {
         for (const sample of results.samples) {
           defaultSettings.sampleVisibility[sample.column] = true
         }
       }
-      console.log(result)
-      const plotSettings: PlotData = {id: result.plotTitle, filename: result.filename, df: results.data, form: result.form, settings: defaultSettings, plotType: result.plotType, samples: results.samples, extraMetaDataDBID: result.data.extraMetaDataDBID, searchLinkTo: result.searchLinkTo, ptm: result.ptm}
+      const plotSettings: PlotData = {
+        id: result.plotTitle,
+        filename: result.filename,
+        df: results.data,
+        form: result.form,
+        settings: defaultSettings,
+        plotType: result.plotType,
+        samples: results.samples,
+        extraMetaDataDBID: result.data.extraMetaDataDBID,
+        searchLinkTo: result.searchLinkTo,
+        ptm: result.ptm
+      }
       if (result.searchLinkTo === "") {
         plotSettings.searchLinkTo = result.plotTitle
       } else {
         const linkedToPlot = this.dataService.plotLists.find((plot) => plot.id === result.searchLinkTo)
-        console.log(linkedToPlot)
+
         if (linkedToPlot) {
           const data = plotSettings.df.getSeries(plotSettings.form.primaryID)
           const dataHas = data.where((value) => value in linkedToPlot.settings.selectedMap).bake()
@@ -120,7 +133,7 @@ export class AppComponent implements OnInit{
   openSelectExtraMetadataModal(fileName: string) {
     const df = this.dataService.data.files.get(fileName)
     if (df) {
-      const select = this.modal.open(SelectExtraMetadataModalComponent)
+      const select = this.modal.open(SelectExtraMetadataModalComponent, {backdrop: "static"})
       select.componentInstance.data = df.df
       select.componentInstance.filenameList = this.dataService.data.filenameList.filter((value) => {
         return !!(this.dataService.data.files.get(value)?.extraMetaDataDBID && this.dataService.data.files.get(value)?.extraMetaDataDBID !== "" && value !== fileName);

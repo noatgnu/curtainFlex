@@ -67,9 +67,11 @@ export class ChartSelectionComponent implements AfterViewInit{
     filename: ['',],
     searchLinkTo: ['',],
     ptm: [false,],
+    comparison: [''],
+    comparisonCol: [''],
   })
 
-
+  comparisons: string[] = []
 
   constructor(public activeModal: NgbActiveModal, private fb: FormBuilder, private changeDetectorRef: ChangeDetectorRef) {
 
@@ -84,6 +86,12 @@ export class ChartSelectionComponent implements AfterViewInit{
       if (value) {
         this.selectedPlotType = value
         changeDetectorRef.detectChanges()
+      }
+    })
+    this.initialForm.controls["comparisonCol"].valueChanges.subscribe((value) => {
+      if (value !== null && value !== "") {
+        this.comparisons = this.selectedDF.getSeries(value).distinct().bake().toArray()
+        this.initialForm.controls["comparison"].setValue(this.comparisons[0] || "")
       }
     })
   }
@@ -155,6 +163,8 @@ export class ChartSelectionComponent implements AfterViewInit{
         plotTitle: this.initialForm.value['plotTitle'],
         searchLinkTo: this.initialForm.value['searchLinkTo'],
         ptm: this.initialForm.value['ptm'],
+        comparison: this.initialForm.value['comparison'],
+        comparisonCol: this.initialForm.value['comparisonCol'],
       })
     }
   }

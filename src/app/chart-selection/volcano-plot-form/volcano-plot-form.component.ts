@@ -25,5 +25,6 @@ export class VolcanoPlotFormComponent {
     minuslog10pValue: [''],
     performMinuslog10Transform: [false],
   })
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder) {
+  }
 }

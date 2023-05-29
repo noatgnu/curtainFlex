@@ -70,6 +70,7 @@ export class VolcanoPlotComponent implements OnDestroy{
   extraMetaDataDBID: string = ""
   plotId = ""
   searchLinkTo = ""
+  currentPosition = 0
   @Input() set data(value: PlotData) {
     this.plotId = value.id
     this.searchLinkTo = value.searchLinkTo
@@ -85,7 +86,16 @@ export class VolcanoPlotComponent implements OnDestroy{
     this.form.controls['pCutOff'].setValue(this.settings.pCutOff)
     this.form.controls['fcCutOff'].setValue(this.settings.fcCutOff)
     this.form.controls['backgroundColorGrey'].setValue(this.settings.backgroundColorGrey)
+    this.form.controls['minX'].setValue(this.settings.volcanoAxis.minX)
+    this.form.controls['maxX'].setValue(this.settings.volcanoAxis.maxX)
+    this.form.controls['minY'].setValue(this.settings.volcanoAxis.minY)
+    this.form.controls['maxY'].setValue(this.settings.volcanoAxis.maxY)
     this.df = value.df
+    if (value.form.comparisonCol && value.form.comparisonCol !== "") {
+      if (value.form.comparison && value.form.comparison !== "") {
+        this.df = this.df.where(row => row[value.form.comparisonCol] === value.form.comparison).bake()
+      }
+    }
     if (this.subscription) {
       this.subscription.unsubscribe()
     }
@@ -200,7 +210,7 @@ export class VolcanoPlotComponent implements OnDestroy{
     if (this.settings.manualAxis && this.settings.volcanoAxis.maxY) {
       this.graphLayout.yaxis.range[1] = this.settings.volcanoAxis.maxY
     }
-    let currentPosition = 0
+    //let currentPosition = 0
     for (const row of this.df) {
       const fc = row[this.fcColumn]
       const pValue = row[this.pValueColumn]
@@ -242,10 +252,10 @@ export class VolcanoPlotComponent implements OnDestroy{
         const group = this.dataService.significantGroup(fc, pValue, this.settings.pCutOff, this.settings.fcCutOff)
         if (!(group in temp)) {
           if (!(group in this.settings.colorMap)) {
-            this.settings.colorMap[group] = this.dataService.palette.pastel[currentPosition]
-            currentPosition ++
-            if (currentPosition === this.dataService.palette.pastel.length) {
-              currentPosition = 0
+            this.settings.colorMap[group] = this.dataService.palette.pastel[this.currentPosition]
+            this.currentPosition ++
+            if (this.currentPosition === this.dataService.palette.pastel.length) {
+              this.currentPosition = 0
             }
           }
           temp[group] = {
@@ -301,7 +311,7 @@ export class VolcanoPlotComponent implements OnDestroy{
     if (this.settings.colorMap) {
       currentColors = Object.values(this.settings.colorMap)
     }
-    let currentPosition = 0
+
     let temp: any = {}
     temp["Background"] = {
       x:[],
@@ -322,23 +332,23 @@ export class VolcanoPlotComponent implements OnDestroy{
       if (!this.settings.colorMap[s]) {
         while (true) {
           if (this.breakColor) {
-            this.settings.colorMap[s] = this.dataService.palette.pastel[currentPosition]
+            this.settings.colorMap[s] = this.dataService.palette.pastel[this.currentPosition]
             break
           }
-          if (currentColors.indexOf(this.dataService.palette.pastel[currentPosition]) !== -1) {
-            currentPosition ++
-          } else if (currentPosition !==this.dataService.palette.pastel.length) {
-            this.settings.colorMap[s] = this.dataService.palette.pastel[currentPosition]
+          if (currentColors.indexOf(this.dataService.palette.pastel[this.currentPosition]) !== -1) {
+            this.currentPosition ++
+          } else if (this.currentPosition !==this.dataService.palette.pastel.length) {
+            this.settings.colorMap[s] = this.dataService.palette.pastel[this.currentPosition]
             break
           } else {
             this.breakColor = true
-            currentPosition = 0
+            this.currentPosition = 0
           }
         }
 
-        currentPosition ++
-        if (currentPosition === this.dataService.palette.pastel.length) {
-          currentPosition = 0
+        this.currentPosition ++
+        if (this.currentPosition === this.dataService.palette.pastel.length) {
+          this.currentPosition = 0
         }
       }
 
@@ -410,6 +420,7 @@ export class VolcanoPlotComponent implements OnDestroy{
         dash: 'dot'
       }
     })
+    console.log(cutOff)
     this.graphLayout.shapes = cutOff
   }
 

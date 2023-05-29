@@ -26,6 +26,7 @@ export class ChartDeckComponent implements OnDestroy{
     searchLinkTo: "",
     ptm: false,
   }
+  df: IDataFrame = new DataFrame()
   filteredData: IDataFrame = new DataFrame()
   filteredPTMData: ISeries<number, IDataFrame> = new Series()
   plotDataArray: PlotDataGeneric[] = []
@@ -89,13 +90,18 @@ export class ChartDeckComponent implements OnDestroy{
         searchLinkTo: this._data.searchLinkTo,
         extraMetaDataDBID: this._data.extraMetaDataDBID
       }
-      if (this._data.ptm !== true) {
-        this.filteredData = this._data.df.where((row: any) => row[this._data.form.primaryID] in this.data.settings.selectedMap).bake()
-        if (this.filteredData.count() === 0) {
-          this.filteredData = this._data.df
+      this.df = this._data.df
+      if (this._data.form.comparisonCol && this._data.form.comparisonCol !== "") {
+        if (this._data.form.comparison && this._data.form.comparison !== "") {
+          this.df = this.df.where(row => row[this._data.form.comparisonCol] === this._data.form.comparison).bake()
         }
+      }
+      if (this._data.ptm !== true) {
+        this.filteredData = this.df.where((row: any) => row[this._data.form.primaryID] in this.data.settings.selectedMap).bake()
 
-
+        if (this.filteredData.count() === 0) {
+          this.filteredData = this.df
+        }
 
         this.plotDataArray = this.filteredData.toArray().map((row: any) => {
           const res = JSON.parse(JSON.stringify(result))
@@ -112,7 +118,7 @@ export class ChartDeckComponent implements OnDestroy{
           let df: IDataFrame = new DataFrame()
           if (this._data.extraMetaDataDBID !== this._data.filename) {
             if (extra && ptmData) {
-              df = this._data.df.join(ptmData.df, left => left[this._data.form.primaryID], right => right[extra.form.primaryID], (left, right) => {
+              df = this.df.join(ptmData.df, left => left[this._data.form.primaryID], right => right[extra.form.primaryID], (left, right) => {
                 return {
                   ...left,
                   ...right
@@ -122,7 +128,7 @@ export class ChartDeckComponent implements OnDestroy{
           } else {
             if (extra && ptmData) {
               if (extra && ptmData) {
-                df = this._data.df
+                df = this.df
               }
             }
           }

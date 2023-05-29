@@ -37,6 +37,21 @@
         </ng-container>
       </select>
     </div>
+    <ng-container *ngIf="selectedDF.getColumnNames().length > 0 && selectedPlotType !== ''">
+      <div class="form-group">
+        <label for="comparisonCol">Comparison Column</label>
+        <select formControlName="comparisonCol" class="form-control" id="comparisonCol">
+          <option *ngFor="let col of selectedDF.getColumnNames()" [value]="col">{{col}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="comparison">Comparison</label>
+        <select formControlName="comparison" class="form-control" id="comparison">
+          <option *ngFor="let comp of comparisons" [value]="comp">{{comp}}</option>
+        </select>
+      </div>
+    </ng-container>
+
   </form>
   <ng-container *ngIf="selectedDF.getColumnNames().length > 0 && selectedPlotType !== ''">
     <ng-container [ngSwitch]="selectedPlotType">

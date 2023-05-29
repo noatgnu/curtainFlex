@@ -528,7 +528,7 @@ export class DataService {
   saveSessionToWeb() {
     const tobeExported = this.getDataPack();
 
-    this.accountsService.curtainAPI.putSettings(tobeExported, !this.accountsService.curtainAPI.user.loginStatus, "").then((res) => {
+    this.accountsService.curtainAPI.putSettings(tobeExported, !this.accountsService.curtainAPI.user.loginStatus, "", "F").then((res) => {
       if (res.data) {
         this.currentSession.id = res.data.link_id
         this.currentSession.data = res.data
