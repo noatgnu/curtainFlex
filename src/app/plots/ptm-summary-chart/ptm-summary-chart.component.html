@@ -5,7 +5,7 @@
   <div class="col-9">
     <div class="card border-dark">
       <div class="card-body">
-        <ul ngbNav #nav="ngbNav" class="nav-tabs" [destroyOnHide]="false">
+        <ul ngbNav #nav="ngbNav" class="nav-tabs">
           <li ngbNavItem="table">
             <button ngbNavLink>Intensity Data</button>
             <ng-template ngbNavContent>
@@ -65,7 +65,7 @@
                           <div ngbDropdownMenu>
                             <button ngbDropdownItem (click)="toggleVisual(ptm.df[data.form.primaryID])"><i class="bi bi-file-bar-graph"></i> Toggle Visualization</button>
                             <div ngbDropdownItem>
-                              <form [formGroup]="annotationFormMap[data.form.primaryID]">
+                              <form [formGroup]="annotationFormMap[ptm.df[data.form.primaryID]]">
                                 <div class="form-check">
                                   <input class="form-check-input" type="checkbox" formArrayName="toggleAnnotation">
                                   <label class="form-check-label">Annotate on volcano plot</label>
@@ -89,7 +89,7 @@
               </table>
             </ng-template>
           </li>
-          <li ngbNavItem="STRING" [destroyOnHide]="true">
+          <li ngbNavItem="STRING">
             <button ngbNavLink>STRING</button>
             <ng-template ngbNavContent>
               <app-string-db [data]="{metaData, searchLinkTo: data.searchLinkTo}"></app-string-db>

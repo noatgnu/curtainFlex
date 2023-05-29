@@ -60,8 +60,9 @@ export class AppComponent implements OnInit{
     modalRef.componentInstance.data = this.dataService.data
     modalRef.componentInstance.plotList = this.dataService.plotLists
     modalRef.closed.subscribe((result) => {
+      console.log(result)
       let df = result.data.df
-      const results = this.dataService.processForm(result.plotTitle, df, result.form, result.plotType)
+      const results = this.dataService.processForm(result.plotTitle, df, {...result.form}, result.plotType)
       results.form.comparisonCol = result.comparisonCol
       results.form.comparison = result.comparison
       const defaultSettings: any = this.dataService.getDefaultsPlotOptions(result.plotType)

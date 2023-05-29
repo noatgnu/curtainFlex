@@ -10,14 +10,16 @@
       <p class="card-text">
         <b>Protein name</b> {{proteinName}}<br>
       </p>
-      <ng-container *ngIf="relatedVolcano.selectedMap">
-        <ng-container *ngIf="relatedVolcano.selectedMap[primaryId]">
-          <p class="card-text" *ngIf="relatedVolcano.selectedMap[primaryId].length > 0">
-            Selected in <span *ngFor="let s of relatedVolcano.selectedMap[primaryId]" style="'color': {{relatedVolcano.colorMap[s]}}">{{s}} </span>
-          </p>
+      <ng-container *ngIf="relatedVolcano">
+        <ng-container *ngIf="relatedVolcano.selectedMap">
+          <ng-container *ngIf="relatedVolcano.selectedMap[primaryId]">
+            <p class="card-text" *ngIf="relatedVolcano.selectedMap[primaryId].length > 0">
+              Selected in <span *ngFor="let s of relatedVolcano.selectedMap[primaryId]" style="'color': {{relatedVolcano.colorMap[s]}}">{{s}} </span>
+            </p>
+          </ng-container>
         </ng-container>
-
       </ng-container>
+
       <div class="d-flex">
         <div class="p-2">
           <button class="btn btn-sm btn-secondary" (click)="openPDBViewer()">AlphaFold Structure</button>

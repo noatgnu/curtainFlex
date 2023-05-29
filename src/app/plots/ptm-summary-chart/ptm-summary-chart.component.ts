@@ -48,6 +48,8 @@ export class PtmSummaryChartComponent {
 
   @Output() toggleAnnotation: EventEmitter<{ state:boolean, primaryID: string }> = new EventEmitter<{state: boolean, primaryID: string}>()
   @Input() set data(value: PlotDataGeneric) {
+    this._data = value
+    console.log(this._data)
     if (value.extraMetaDataDBID && value.df) {
       this.extraMetaDataDBID = value.extraMetaDataDBID
       const extra = this.dataService.extraMetaData.get(this.extraMetaDataDBID)
@@ -74,6 +76,9 @@ export class PtmSummaryChartComponent {
           const form = this.fb.group({
             toggleAnnotation: [false,],
           })
+          console.log(this.visualizationState)
+          console.log(row)
+          console.log(this.data.form)
           form.controls.toggleAnnotation.valueChanges.subscribe((data) => {
             if (data) {
               this.toggleAnnotation.emit({state: data, primaryID: row[value.form.primaryID]})
@@ -86,7 +91,7 @@ export class PtmSummaryChartComponent {
         })
       }
     }
-    this._data = value
+
   }
   get data(): PlotDataGeneric {
     return this._data

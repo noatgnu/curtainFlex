@@ -13,7 +13,7 @@ import {PlotData} from "../interface/plot-data";
 import {PtmSummaryChartFormComponent} from "./ptm-summary-chart-form/ptm-summary-chart-form.component";
 
 @Component({
-  selector: 'app-cha rt-selection',
+  selector: 'app-chart-selection',
   templateUrl: './chart-selection.component.html',
   styleUrls: ['./chart-selection.component.less']
 })
