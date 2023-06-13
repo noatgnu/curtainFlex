@@ -21,6 +21,7 @@ export class StringDbComponent {
   private _data: any = {}
   relatedVolcano: PlotData[] = []
   selectedVolcanoID: string = ""
+  isPTM: boolean = false
   @Input() set data(value: any) {
     this._data = value
     console.log(value)
@@ -32,6 +33,9 @@ export class StringDbComponent {
       this.relatedVolcano = this.dataService.plotLists.filter((i: PlotData) => (i.searchLinkTo === this.data.searchLinkTo) && (i.plotType === "volcano-plot"))
       if (this.relatedVolcano.length > 0) {
         this.selectedVolcanoID = this.relatedVolcano[0].id
+        if (this.relatedVolcano[0].ptm) {
+          this.isPTM = true
+        }
       }
     }
 
@@ -54,21 +58,24 @@ export class StringDbComponent {
     let increased: string[] = []
     let decreased: string[] = []
     let allGenes: string[] = []
-    if (this.selectedVolcanoID !== "" && this.selectedVolcanoID !== undefined) {
-      const volcanoData = this.dataService.differentialMap.get(this.selectedVolcanoID)
-      if (volcanoData) {
-        Object.values(volcanoData.increase).forEach((i: any) => {
-          increased.push(...i.geneNames)
-        })
-        Object.values(volcanoData.decrease).forEach((i: any) => {
-          decreased.push(...i.geneNames)
-        })
-        allGenes = increased.concat(decreased)
-        Object.values(volcanoData.notSignificant).forEach((i: any) => {
-          allGenes.push(...i.geneNames)
-        })
+    if (!this.isPTM) {
+      if (this.selectedVolcanoID !== "" && this.selectedVolcanoID !== undefined) {
+        const volcanoData = this.dataService.differentialMap.get(this.selectedVolcanoID)
+        if (volcanoData) {
+          Object.values(volcanoData.increase).forEach((i: any) => {
+            increased.push(...i.geneNames)
+          })
+          Object.values(volcanoData.decrease).forEach((i: any) => {
+            decreased.push(...i.geneNames)
+          })
+          allGenes = increased.concat(decreased)
+          Object.values(volcanoData.notSignificant).forEach((i: any) => {
+            allGenes.push(...i.geneNames)
+          })
+        }
       }
     }
+
 
     setTimeout(()=> {
       getSTRING('https://string-db.org',

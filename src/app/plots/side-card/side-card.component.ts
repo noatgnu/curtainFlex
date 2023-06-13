@@ -21,8 +21,9 @@ export class SideCardComponent {
   relatedVolcano: any = {}
 
   @Input() set data(value: any) {
+    console.log(value)
     this.hasExtra = value["hasExtra"]
-    this.primaryId = value["primaryID"]
+    this.primaryId = value["primaryId"]
     this.geneName = value["metaData"]["Gene Names"]
     this.uniprotAcc = value["metaData"]["Entry"]
     this.proteinName = value["metaData"]["Protein names"]
